@@ -12,13 +12,16 @@ main(:class="{ collection: showCollection, editor: showPlaylist}")
       h1(v-if="showPlaylist") Playlist 
         span(v-if="showPlaylist && setLength > 0") - {{ humaniseDuration(setLength) }}  
       button(v-if="showPlaylist", @click="lockPlaylist = !lockPlaylist") {{ lockPlaylist? 'Unlock' : 'Lock' }}
+      button(v-if="showPlaylist", @click="showTransitioner = !showTransitioner") Transitioner
     playlist-editor(v-if="showPlaylist", @track-click="removeTrack", :lock="lockPlaylist")
   search-modal(:show="showSearch", @close="showSearch = false")
+  transitioner-modal(:show="showTransitioner", @close="showTransitioner = false")
 </template>
 <script setup lang="ts">
 import AlbumList from "@/components/AlbumList.vue";
 import PlaylistEditor from "@/components/PlaylistEditor.vue";
 import SearchModal from "@/components/SearchModal.vue";
+import TransitionerModal from "@/components/TransitionerModal.vue";
 import { useStore, type TrackClickEvent, type TrackData } from "@/stores/store";
 import { formatDuration, getNewKey } from "@/utils";
 import { storeToRefs } from "pinia";
@@ -26,6 +29,7 @@ import { computed, ref } from "vue";
 
 const store = useStore();
 const showSearch = ref(false);
+const showTransitioner = ref(false);
 const showCollection = ref(true);
 const showPlaylist = ref(true);
 const lockPlaylist = ref(false);

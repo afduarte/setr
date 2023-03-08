@@ -10,6 +10,12 @@ export function getSortingString(a: AlbumData): string {
   return `${artist} ${date} ${title}`;
 }
 
+export function getFormattedTrackName(t: TrackData) {
+  const artist = t.artists.map((a) => a.name).join();
+  const title = t.name;
+  return `${artist} - ${title}`;
+}
+
 export interface Image {
   height: number;
   width: number;
