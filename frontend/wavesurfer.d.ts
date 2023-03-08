@@ -7,6 +7,7 @@ declare module "wavesurfer.js" {
     height: number;
     width: number;
     params: any;
+    container: HTMLElement;
     pixelRatio: number;
     wrapper: HTMLElement;
     waveContainer: HTMLElement;
@@ -72,10 +73,14 @@ declare module "wavesurfer.js" {
     static create(params: WaveSurferParams): WaveSurfer;
     static minimap(MinimapPluginParams): MinimapPlugin;
     constructor(params: WaveSurferParams);
-
+    params: WavesurferParams;
+    drawer: Drawer;
+    backend: WebAudio | MediaElement | MediaElementWebAudio;
+    container: HTMLElement;
     init(): WaveSurfer;
     destroy(): void;
     isDestroyed(): boolean;
+    on(event: string, fn: function);
     load(
       url: string | HTMLMediaElement,
       peaks?: number[] | number[][]

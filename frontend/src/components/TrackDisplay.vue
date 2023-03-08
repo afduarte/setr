@@ -183,7 +183,7 @@ function controlledEmit(evt: any, ...args: any[]) {
   border-top: 2px solid var(--color-text);
 }
 .track button.active {
-  border-color: var(--color-text);
+  background-color: var(--color-text);
   color: var(--color-background-mute);
 }
 </style>

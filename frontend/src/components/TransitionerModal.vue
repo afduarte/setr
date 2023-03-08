@@ -6,7 +6,12 @@ teleport(to="body")
       .container(@click.stop="")
         .tracks
           h2 {{ trackName(store.trackA) }}
-          wavesurfer(:srcA="getURL(store.trackAMeta)", :srcB="getURL(store.trackBMeta)")
+          wavesurfer(
+            :trackA="store.trackA",
+            :trackB="store.trackB",
+            :srcA="getURL(store.trackAMeta)", 
+            :srcB="getURL(store.trackBMeta)"
+            )
           h2 {{ trackName(store.trackB) }}
 
           
@@ -60,10 +65,10 @@ function close() {
   grid-template-columns: 1fr 20fr 1fr;
   z-index: 10;
   position: absolute;
-  top: 10%;
+  top: 2%;
 }
 .container {
-  width: 70%;
+  width: 80%;
   grid-column: 2;
   margin: 0 auto;
   padding: 10px;

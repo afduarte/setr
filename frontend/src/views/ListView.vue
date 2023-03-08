@@ -52,6 +52,7 @@ function humaniseDuration(duration: number) {
 <style lang="scss" scoped>
 main {
   width: 100%;
+  padding-top: 20px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   &.collection {
