@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getFromCache, storeInCache} from './cache.js'
 
 const API = 'https://api.spotify.com/v1'
 
@@ -6,6 +7,8 @@ const client_id = 'd185711092bf486090bc56a9a58dce0a';
 const client_secret = '959e05d7dd414f2e8929b4d11ef1446e';
 
 export async function specificAlbumGet(token, id){
+  const cached = await getFromCache(id);
+  if(cached) return cached;
   let {albumData, tracks} = await getAlbumDataById(token, id);
   if(!albumData) throw new Error("Album not found");
   // cleanup available_markets field
@@ -20,11 +23,12 @@ export async function specificAlbumGet(token, id){
     const features = audioFeatures.find(x => x.id === t.id)
     return {...t, audioFeatures: features}
   })
-  return {
+  const album = {
     ...albumData,
     tracks,
   };
-  
+  storeInCache(id, album)
+  return album;
 }
 
 export async function searchArtistAlbum(token, artist, album){
@@ -82,6 +86,6 @@ export async function getAlbumData(token, artist, album){
 export async function getToken(){
   const { data } = await axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credentials', {
   headers: { 'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64')) }
-});
-return data.access_token;
+  });
+  return data.access_token;
 }

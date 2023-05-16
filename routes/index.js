@@ -60,8 +60,8 @@ router.get('/transitioner-search', async (req, res) => {
 router.get('/transitioner-dl', async (req, res) => {
   const id = req.query.id;
   try{
-    const stream = downloadYoutube(id)
-    ;(await stream).pipe(res)
+    const stream = await downloadYoutube(id)
+    stream.pipe(res)
   }catch(e){
     console.log(e)
     return res.status(404).send(e.message);
