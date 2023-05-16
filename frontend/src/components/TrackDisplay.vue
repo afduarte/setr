@@ -177,6 +177,9 @@ function controlledEmit(evt: any, ...args: any[]) {
     }
   }
 }
+.cross {
+  cursor: pointer;
+}
 </style>
 <style scoped>
 .track {

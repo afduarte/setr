@@ -99,9 +99,15 @@ export type EnhancedTrack = TrackData & {
   note: string;
 };
 
+export type AlbumMeta = {
+  id: string;
+  tags: string[];
+};
+
 export const useStore = defineStore("store", {
   state() {
     return {
+      collection: [] as AlbumMeta[],
       albums: useLocalStorage<(AlbumData | string)[]>("albums", []),
       playlist: useLocalStorage<EnhancedTrack[]>("playlist", []),
       searchResults: [] as AlbumData[],
@@ -121,6 +127,9 @@ export const useStore = defineStore("store", {
       );
       this.albums = data;
     },
+    async getCollection(){
+      
+    },
     async search(q: string) {
       if (q.includes("spotify")) {
         const id = getSpotifyIDFromURL(q);
@@ -139,6 +148,10 @@ export const useStore = defineStore("store", {
     async addAlbum(id: string) {
       const { data } = await axios.get<AlbumData>(`/api/album-by-id/${id}`);
       this.albums.push(data);
+    },
+    removeAlbum(a: AlbumData) {
+      const idx = this.albums.indexOf(a);
+      if (idx > -1) this.albums.splice(idx, 1);
     },
     addTrack(t: TrackData) {
       // Turn the track into an enhanced track so we persist notes and adjustment data

@@ -15,7 +15,7 @@ async function onDrop(acceptFiles: File[], rejectReasons: any) {
   if (!acceptFiles.length) return;
 
   await store.uploadCSV(acceptFiles[0]);
-  router.push({ name: "list" });
+  router.push({ name: "home" });
 }
 
 const options: Partial<FileUploadOptions> = { onDrop };

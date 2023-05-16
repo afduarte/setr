@@ -10,7 +10,7 @@
       p {{ ((trackA?.audioFeatures?.tempo || 0) * rateA).toFixed(2) }} ({{ (trackA?.adjustment || 0) }})
       vue-slider(v-model="trackA.adjustment", :min="-50",:max="50", :interval="0.1", direction="ltr", width="50%")
       .minimap(ref="mapA")
-      .wavesurfer(ref="elA", @mousedown="")
+      .wavesurfer(ref="elA")
   .wave
     .vol
       vue-slider(v-model="volB", :min="0",:max="1", :interval="0.1", direction="btt", height="100%")
@@ -23,12 +23,20 @@
 
 <script setup lang="ts">
 import type { EnhancedTrack } from "@/stores/store";
-import { ref, onBeforeUnmount, onMounted, computed, watch } from "vue";
+import {
+  ref,
+  onBeforeUnmount,
+  onMounted,
+  computed,
+  watch,
+  type Ref,
+} from "vue";
 import WaveSurfer, { type WavesurferParams } from "wavesurfer.js";
 import Minimap from "wavesurfer.js/dist/plugin/wavesurfer.minimap.js";
 // import * as Minimap from "wavesurfer.js/dist/plugin/wavesurfer.minimap.js";
 import VueSlider from "vue-slider-component";
 import "vue-slider-component/theme/antd.css";
+import { useScrollDrag } from "@/composables/useScrollDrag";
 
 // boilerplate
 const parent = ref<HTMLElement | null>(null);
@@ -58,12 +66,16 @@ watch(volB, (newVal: number) => wsB?.value?.setVolume(newVal));
 // load
 onMounted(() => {
   const baseOptions = {
+    backend: "WebAudio",
     waveColor: "#00eeffbb",
     progressColor: "purple",
     scrollParent: true,
     fillParent: false,
     hideScrollBar: true,
+    autoCenter: true,
+    interact: false,
     mediaControls: true,
+    maxCanvasWidth: 40000,
     barGap: 1,
     barHeight: 1,
     barMinHeight: 1,
@@ -86,8 +98,12 @@ onMounted(() => {
         regionsMaxWidth: 5.0,
         regions: [],
       }),
-    ]
+    ],
   });
+  const childWaveA = ref(elA?.value?.querySelector("wave"));
+  if (childWaveA.value) {
+    useScrollDrag(childWaveA as Ref<HTMLElement>);
+  }
   wsB.value = WaveSurfer.create({
     ...baseOptions,
     container: elB?.value,
@@ -103,8 +119,12 @@ onMounted(() => {
         regionsMaxWidth: 5.0,
         regions: [],
       }),
-    ]
+    ],
   });
+  const childWaveB = ref(elB?.value?.querySelector("wave"));
+  if (childWaveB.value) {
+    useScrollDrag(childWaveB as Ref<HTMLElement>);
+  }
   // load both songs
   wsA.value.load(props.srcA);
   wsB.value.load(props.srcB);
@@ -112,15 +132,20 @@ onMounted(() => {
   wsA.value.on("ready", () => centerplayhead(wsA.value));
   wsB.value.on("ready", () => centerplayhead(wsB.value));
 });
+
 function centerplayhead(ws: WaveSurfer | null) {
-  console.log(ws);
+  console.log("centering playhead")
   if (!ws) return;
-  // Get the audio duration
-  const duration = ws.backend.getDuration();
+  const sampleRate = 1000;
+  const numberOfSamples = sampleRate * ws.getDuration();
+  const peaks = ws.backend.getPeaks(numberOfSamples);
   // Calculate the position of the audio start
-  const startPosition = ws.container.clientWidth / 2;
-  // Set the waveform to start at the calculated position
-  ws.drawer.container.style.marginRight = `${-startPosition}px`;
+  const silence = Array(sampleRate * 5 * 2).fill(0);
+  console.log(silence);
+  ws.backend.setPeaks(silence.concat(peaks));
+  // const startPosition = ws.container.clientWidth / 2;
+  // // Set the waveform to start at the calculated position
+  // ws.drawer.container.style.marginLeft = `${startPosition}px`;
 }
 onBeforeUnmount(() => {
   wsA?.value?.destroy();
@@ -135,5 +160,8 @@ onBeforeUnmount(() => {
 }
 .wavesurfer {
   width: 100%;
+  canvas {
+    left: 50% !important;
+  }
 }
 </style>

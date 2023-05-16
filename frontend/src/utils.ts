@@ -1,3 +1,5 @@
+import { createAuth0 } from "@auth0/auth0-vue";
+
 export function formatDuration(ms: number) {
   const secs = ms / 1000;
   const hours = Math.floor(secs / 3600);
@@ -119,3 +121,10 @@ export function getSpotifyIDFromURL(s: string) {
   // https://open.spotify.com/album/{id}
   return s.split("/").pop();
 }
+
+// Create a shared auth0 client instance
+export const auth0 = createAuth0({
+  domain: "setr.uk.auth0.com",
+  clientId: "qbA6LQKWUmclCFyjqYfJSfH6Wr5RVFST",
+  authorizationParams: { redirect_uri: window.location.origin },
+});

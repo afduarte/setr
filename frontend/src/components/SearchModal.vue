@@ -5,7 +5,7 @@ teleport(to="body")
     .modal(@click="close")
       .container(@click.stop="")
         .search
-          input(type="text", placeholder="Album search...", @input="store.search($event.target.value)")
+          input(ref="search", type="text", placeholder="Album search...", @input="store.search($event.target.value)")
         .results
           album-display(v-for="a in store.searchResults", :hideTracks="true", :album="a", @click.stop="fetchAlbum(a)")
 
@@ -13,11 +13,13 @@ teleport(to="body")
 <script lang="ts" setup>
 import AlbumDisplay from "./AlbumDisplay.vue";
 import { useStore, type AlbumData } from "@/stores/store";
-import { ref } from "vue";
+import { nextTick, onMounted, ref, toRef, watch } from "vue";
 
-defineProps<{ show: boolean }>();
+const props = defineProps<{ show: boolean }>();
 const emit = defineEmits(["close"]);
 const store = useStore();
+const search = ref<HTMLInputElement | null>(null);
+const show = toRef(props, "show");
 
 async function fetchAlbum(a: AlbumData) {
   await store.addAlbum(a.id);
@@ -29,6 +31,10 @@ function close() {
   store.clearSearch();
   emit("close");
 }
+
+watch(show, (newVal) => {
+  if (newVal) nextTick(() => search.value?.focus());
+});
 </script>
 <style scoped>
 .mask {

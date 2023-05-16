@@ -1,11 +1,11 @@
 <template lang="pug">
-main(:class="{ collection: showCollection, editor: showPlaylist}")
+.container(:class="{ collection: showCollection, editor: showPlaylist}")
   .collection
     .header
       h2(v-if="showCollection") Collection
       button(v-if="showCollection", @click="showSearch = !showSearch") Add Album
       button.caret(@click="showCollection = !showCollection") {{ showCollection? '‹': '›' }}
-    album-list(v-if="showCollection", :albums="albums", @track-click="addTrack")
+    album-list(v-if="showCollection", :albums="albums", @track-click="addTrack", @album-delete="removeAlbum")
   .editor
     .header
       button.caret(@click="showPlaylist = !showPlaylist") {{ showPlaylist? '›' : '‹' }}
@@ -22,7 +22,12 @@ import AlbumList from "@/components/AlbumList.vue";
 import PlaylistEditor from "@/components/PlaylistEditor.vue";
 import SearchModal from "@/components/SearchModal.vue";
 import TransitionerModal from "@/components/TransitionerModal.vue";
-import { useStore, type TrackClickEvent, type TrackData } from "@/stores/store";
+import {
+  useStore,
+  type TrackClickEvent,
+  type TrackData,
+  type AlbumData,
+} from "@/stores/store";
 import { formatDuration, getNewKey } from "@/utils";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
@@ -40,6 +45,9 @@ function addTrack(t: TrackClickEvent) {
 function removeTrack(t: TrackClickEvent) {
   store.removeTrack(t);
 }
+function removeAlbum(a: AlbumData) {
+  store.removeAlbum(a);
+}
 const setLength = computed(() =>
   playlist.value.reduce((prev: number, track: TrackData) => {
     return prev + (track.audioFeatures?.duration_ms || 0);
@@ -50,7 +58,7 @@ function humaniseDuration(duration: number) {
 }
 </script>
 <style lang="scss" scoped>
-main {
+.container {
   width: 100%;
   padding-top: 20px;
   display: grid;

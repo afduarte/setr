@@ -1,5 +1,6 @@
 <template lang="pug">
 .album-wrapper
+  p.cross(@click="$emit('cross-click')") ❌
   .album(v-if="isMissingAlbum")
     .info
       img(:src="placeHolder")
@@ -70,11 +71,16 @@ const placeHolder = computed(() => placeHolderURL);
     }
   }
 }
+.cross {
+  cursor: pointer;
+}
 </style>
 <style scoped>
 .album-wrapper {
   border-top: 1px solid var(--color-text);
   padding-top: 5px;
+  display: grid;
+  grid-template-columns: 2fr 45fr;
 }
 
 </style>
