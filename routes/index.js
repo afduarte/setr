@@ -3,11 +3,12 @@ import multer from 'multer';
 import neatCsv from 'neat-csv';
 import {specificAlbumGet, generalSearch, getToken, searchArtistAlbum, } from '../util/spotify.js'
 import { downloadYoutube, searchYoutube } from '../util/youtube.js';
+import { getUserInfo, tokenMiddleware, getUserData } from '../util/user.js';
 
 
 
 const router = Router();
-/* GET home page. */
+// Non-user routes
 router.get('/', (_, res) => res.send("OK"));
 
 router.get('/token', async (_, res) => res.send(await getToken()));
@@ -68,6 +69,7 @@ router.get('/transitioner-dl', async (req, res) => {
   }
 });
 
+// User specific routes
 const upload = multer({storage: multer.memoryStorage()}).single("csv");
 router.post('/csv', upload, async (req, res) => {
   try{
@@ -87,5 +89,26 @@ router.post('/csv', upload, async (req, res) => {
   return res.status(400).send(e.message);
 }
 });
+
+// Collection
+router.get('/user', tokenMiddleware, async (req, res) => {
+  try{
+    const userInfo = await getUserInfo(req.token);
+    const userData = await getUserData(userInfo.sub);
+    return res.send(userData);
+  }catch(e){
+    return res.status(400).send(e.message);
+  }
+})
+
+router.put('/user/collection/add/:id', tokenMiddleware, async (req, res) => {
+  try{
+    const userInfo = await getUserInfo(req.token);
+    const userData = await getUserData(userInfo.sub);
+    return res.send(userData);
+  }catch(e){
+    return res.status(400).send(e.message);
+  }
+})
 
 export default router;

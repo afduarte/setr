@@ -1,0 +1,52 @@
+version: v3
+services:
+  gateway:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ${PWD}/gateway/html:/html
+      - ${PWD}/gateway/default.conf:/etc/nginx/conf.d/default.conf
+    restart: on-failure
+    depends_on:
+      - api
+      - db
+    networks:
+      - setr-net
+  api:
+    image: setr-api:latest
+    restart: on-failure
+    volumes:
+      - ${PWD}/cache/albums:/app/data/albums
+      - ${PWD}/cache/users:/app/data/users
+    networks:
+      - setr-net
+
+  db:
+    image: postgres:15-alpine
+    restart: on-failure
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: supersafepassword
+      PGDATA: /data
+    volumes:
+       - ${PWD}/db/data:/data
+       - ${PWD}/db/scripts/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    # ports:
+    #   - "5432:5432"
+    networks:
+      - setr-net
+  # spotify-cache:
+  #   image: varnish:7.3-alpine
+  #   restart: on-failure
+  #   ports:
+  #     - "4080:80"
+  #   environment:
+  #     VARNISH_SIZE: 500M
+  #   volumes:
+  #     - ${PWD}/spotify-cache/default.vcl:/etc/varnish/default.vcl
+  #   networks:
+  #     - setr-net
+
+networks:
+  setr-net:

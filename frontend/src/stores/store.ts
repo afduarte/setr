@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
-import axios from "axios";
 import { useLocalStorage } from "@vueuse/core";
-import { getSpotifyIDFromURL } from "@/utils";
+import { api, getSpotifyIDFromURL } from "@/utils";
 
 export function getSortingString(a: AlbumData): string {
   const artist = a.artists.map((a) => a.name).join();
@@ -99,14 +98,31 @@ export type EnhancedTrack = TrackData & {
   note: string;
 };
 
+export type TrackMeta = {
+  id: string;
+  adjustment: number;
+  note: string;
+};
+
 export type AlbumMeta = {
   id: string;
   tags: string[];
 };
 
+export type Set = {
+  name: string;
+  songs: TrackMeta[];
+};
+
+export type UserData = {
+  collection: AlbumMeta[];
+  sets: Set[];
+};
+
 export const useStore = defineStore("store", {
   state() {
     return {
+      userData: {} as UserData,
       collection: [] as AlbumMeta[],
       albums: useLocalStorage<(AlbumData | string)[]>("albums", []),
       playlist: useLocalStorage<EnhancedTrack[]>("playlist", []),
@@ -117,9 +133,8 @@ export const useStore = defineStore("store", {
     async uploadCSV(f: File) {
       const formData = new FormData();
       formData.append("csv", f);
-
-      const { data } = await axios.post<(AlbumData | string)[]>(
-        `/api/csv`,
+      const { data } = await api.post<(AlbumData | string)[]>(
+        `/csv`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -127,16 +142,17 @@ export const useStore = defineStore("store", {
       );
       this.albums = data;
     },
-    async getCollection(){
-      
+    async getUserData() {
+      const { data } = await api.get(`/user`);
+      console.log(data);
     },
     async search(q: string) {
       if (q.includes("spotify")) {
         const id = getSpotifyIDFromURL(q);
-        const { data } = await axios.get<AlbumData>(`/api/album-by-id/${id}`);
+        const { data } = await api.get<AlbumData>(`/album-by-id/${id}`);
         this.searchResults = [data];
       } else {
-        const { data } = await axios.get<AlbumData[]>("/api/search", {
+        const { data } = await api.get<AlbumData[]>("/search", {
           params: { q },
         });
         this.searchResults = data;
@@ -146,7 +162,7 @@ export const useStore = defineStore("store", {
       this.searchResults = [];
     },
     async addAlbum(id: string) {
-      const { data } = await axios.get<AlbumData>(`/api/album-by-id/${id}`);
+      const { data } = await api.get<AlbumData>(`/album-by-id/${id}`);
       this.albums.push(data);
     },
     removeAlbum(a: AlbumData) {

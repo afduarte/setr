@@ -54,8 +54,8 @@ const placeHolder = computed(() => placeHolderURL);
     display: flex;
     flex-direction: row;
     img {
-      width: 90px;
-      height: 90px;
+      width: 50px;
+      height: 50px;
       margin-right: 5px;
       border-radius: 5px;
     }

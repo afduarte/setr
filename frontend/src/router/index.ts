@@ -5,6 +5,7 @@ import ListView from "../views/ListView.vue";
 import LoginView from "@/views/LoginView.vue";
 import { auth0 } from "@/utils";
 import { authGuard } from "@auth0/auth0-vue";
+import { useStore } from "@/stores/store";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,6 +25,10 @@ const router = createRouter({
           path: "",
           name: "home",
           component: ListView,
+          beforeEnter: async () => {
+            const store = useStore();
+            await store.getUserData();
+          },
         },
         {
           path: "csv",

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getFromCache, storeInCache} from './cache.js'
 
-const API = 'https://api.spotify.com/v1'
+const API = process.env.SPOTIFY || 'https://api.spotify.com/v1'
 
 const client_id = 'd185711092bf486090bc56a9a58dce0a';
 const client_secret = '959e05d7dd414f2e8929b4d11ef1446e';

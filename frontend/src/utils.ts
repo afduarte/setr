@@ -1,4 +1,5 @@
-import { createAuth0 } from "@auth0/auth0-vue";
+import { createAuth0, useAuth0 } from "@auth0/auth0-vue";
+import axios from "axios";
 
 export function formatDuration(ms: number) {
   const secs = ms / 1000;
@@ -127,4 +128,17 @@ export const auth0 = createAuth0({
   domain: "setr.uk.auth0.com",
   clientId: "qbA6LQKWUmclCFyjqYfJSfH6Wr5RVFST",
   authorizationParams: { redirect_uri: window.location.origin },
+});
+
+export const api = axios.create({ baseURL: "/api" });
+// Add a request interceptor to add the token for every request
+api.interceptors.request.use(function (config) {
+  const origConfig = config;
+  return auth0
+    .getAccessTokenSilently()
+    .then((token) => {
+      origConfig.headers.Authorization = `Bearer ${token}`;
+      return Promise.resolve(origConfig);
+    })
+    .catch((error) => Promise.reject(error));
 });

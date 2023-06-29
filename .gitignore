@@ -60,3 +60,8 @@ typings/
 
 # next.js build output
 .next
+
+# deployment stuff
+db/data
+gateway/html
+cache/

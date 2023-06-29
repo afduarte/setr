@@ -7,7 +7,7 @@ import * as url from 'url';
 // Simple cache implementation uses disk for storage.
 // STORAGE_LOCATION is the place where the data will be stored
 const __dirname = url.fileURLToPath(new URL('..', import.meta.url));
-const STORAGE_LOCATION = process.env.STORAGE || path.join(__dirname, "data")
+const STORAGE_LOCATION = process.env.STORAGE || path.join(__dirname, "data", "albums")
 // make sure the location exists and is writable
 async function init(){
   // check if directory exists
