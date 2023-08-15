@@ -22,7 +22,7 @@ const search = ref<HTMLInputElement | null>(null);
 const show = toRef(props, "show");
 
 async function fetchAlbum(a: AlbumData) {
-  await store.addAlbum(a.id);
+  await store.addToCollection(a.id);
   store.clearSearch();
   emit("close");
 }

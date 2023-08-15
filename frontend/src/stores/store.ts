@@ -2,11 +2,18 @@ import { defineStore } from "pinia";
 import { useLocalStorage } from "@vueuse/core";
 import { api, getSpotifyIDFromURL } from "@/utils";
 
-export function getSortingString(a: AlbumData): string {
-  const artist = a.artists.map((a) => a.name).join();
+export function getSortingString(a: EnhancedAlbum): string {
+  const artist = a.artists
+    .map((a) =>
+      a.name
+        .replace(/^[Tt]he\s*/, "")
+        .replace(/[Vv]arious\s*[Aa]rtists\s*/, "")
+        .replace(/^\d/, "#")
+    )
+    .join();
   const date = a.release_date.split("-").shift();
-  const title = a.name;
-  return `${artist} ${date} ${title}`;
+  const title = a.name.replace(/^\d/, "#");
+  return `${artist || title}${date}${title}`;
 }
 
 export function getFormattedTrackName(t: TrackData) {
@@ -109,10 +116,16 @@ export type AlbumMeta = {
   tags: string[];
 };
 
+export type EnhancedAlbum = AlbumData & AlbumMeta;
+
 export type Set = {
+  id: string;
   name: string;
-  songs: TrackMeta[];
+  created: number;
+  tracks: TrackMeta[];
 };
+
+export type EnhancedSet = Set & { tracks: EnhancedTrack[] };
 
 export type UserData = {
   collection: AlbumMeta[];
@@ -124,16 +137,37 @@ export const useStore = defineStore("store", {
     return {
       userData: {} as UserData,
       collection: [] as AlbumMeta[],
-      albums: useLocalStorage<(AlbumData | string)[]>("albums", []),
-      playlist: useLocalStorage<EnhancedTrack[]>("playlist", []),
+      albums: useLocalStorage<{ [id: string]: AlbumData }>("albums", {}),
+      trackToAlbum: {} as { [track: string]: string },
+      albumTags: {} as { [tag: string]: boolean },
+      set: {} as EnhancedSet,
       searchResults: [] as AlbumData[],
     };
   },
   actions: {
+    loadSet(s: Set) {
+      console.log("loading set");
+      const tracks = s.tracks
+        .map((t) => {
+          if (!this.trackToAlbum[t.id]) return;
+          const album = this.albums[this.trackToAlbum[t.id]];
+          if (!album) return;
+          const track = album.tracks.find((x) => x.id == t.id);
+          if (!track) return;
+          return {
+            ...track,
+            adjustment: t.adjustment,
+            note: t.note,
+          } as EnhancedTrack;
+        })
+        .filter((x) => !!x) as EnhancedTrack[];
+
+      this.set = { ...s, tracks };
+    },
     async uploadCSV(f: File) {
       const formData = new FormData();
       formData.append("csv", f);
-      const { data } = await api.post<(AlbumData | string)[]>(
+      const { data } = await api.post<{ [id: string]: AlbumData }>(
         `/csv`,
         formData,
         {
@@ -144,7 +178,27 @@ export const useStore = defineStore("store", {
     },
     async getUserData() {
       const { data } = await api.get(`/user`);
-      console.log(data);
+      this.userData = data;
+      this.downloadCollection();
+    },
+    async saveUserData() {
+      await api.post(`/user`, this.userData);
+      await this.getUserData();
+    },
+    async downloadCollection() {
+      console.log("downloading collection");
+      const promises = this.userData.collection.map((album) => {
+        if (!this.albums[album.id]) {
+          album.tags.forEach((t) => (this.albumTags[t] = true));
+          return this.addAlbum(album.id);
+        } else {
+          this.albums[album.id].tracks.forEach(
+            (t) => (this.trackToAlbum[t.id] = album.id)
+          );
+          return Promise.resolve();
+        }
+      });
+      await Promise.all(promises);
     },
     async search(q: string) {
       if (q.includes("spotify")) {
@@ -161,20 +215,30 @@ export const useStore = defineStore("store", {
     clearSearch() {
       this.searchResults = [];
     },
+    async addSet() {
+      // not implemented
+    },
     async addAlbum(id: string) {
       const { data } = await api.get<AlbumData>(`/album-by-id/${id}`);
-      this.albums.push(data);
+      this.albums[data.id] = data;
+      data.tracks.forEach((t) => (this.trackToAlbum[t.id] = data.id));
     },
-    removeAlbum(a: AlbumData) {
-      const idx = this.albums.indexOf(a);
-      if (idx > -1) this.albums.splice(idx, 1);
+    async addToCollection(id: string) {
+      const { data } = await api.put<UserData>(`/user/collection/add/${id}`);
+      this.userData = data;
+      this.downloadCollection();
     },
-    addTrack(t: TrackData) {
-      // Turn the track into an enhanced track so we persist notes and adjustment data
-      this.playlist.push({ ...t, note: "", adjustment: 0 });
+    async removeFromCollection(id: string) {
+      const r = await api.put<UserData>(`/user/collection/remove/${id}`);
+      this.userData = r.data;
+      this.downloadCollection();
     },
-    removeTrack(t: TrackClickEvent) {
-      this.playlist.splice(t.index, 1);
-    },
+    // addTrack(t: TrackData) {
+    //   // Turn the track into an enhanced track so we persist notes and adjustment data
+    //   this.playlist.push({ ...t, note: "", adjustment: 0 });
+    // },
+    // removeTrack(t: TrackClickEvent) {
+    //   this.playlist.splice(t.index, 1);
+    // },
   },
 });

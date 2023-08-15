@@ -4,16 +4,21 @@
     autosuggest
     editable
     inputPlaceholder="Tags..."
-    :sources="options"
+    :sources="tagsList"
     :allowPaste="{delimiter: ','}"
     :allowDuplicates="false",
     :theme="colours"
     )
 </template>
 <script setup lang="ts">
+import { useStore } from "@/stores/store";
+import { storeToRefs } from "pinia";
 import { SmartTagz } from "smart-tagz";
 import "smart-tagz/dist/smart-tagz.css";
-const options = ["HipHop", "Dancy"];
+import { computed } from "vue";
+const store = useStore();
+const { albumTags } = storeToRefs(store);
+const tagsList = computed(() => Object.values(albumTags.value));
 const colours = {
   primary: "var(--color-primary)",
   background: "var(--color-background-soft)",
@@ -21,7 +26,7 @@ const colours = {
 };
 </script>
 <style lang="scss" scoped>
-.tags-main{
+.tags-main {
   padding: 2px;
 }
 </style>

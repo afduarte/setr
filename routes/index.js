@@ -3,7 +3,7 @@ import multer from 'multer';
 import neatCsv from 'neat-csv';
 import {specificAlbumGet, generalSearch, getToken, searchArtistAlbum, } from '../util/spotify.js'
 import { downloadYoutube, searchYoutube } from '../util/youtube.js';
-import { getUserInfo, tokenMiddleware, getUserData } from '../util/user.js';
+import { getUserInfo, tokenMiddleware, getUserData, saveUserData } from '../util/user.js';
 
 
 
@@ -71,7 +71,7 @@ router.get('/transitioner-dl', async (req, res) => {
 
 // User specific routes
 const upload = multer({storage: multer.memoryStorage()}).single("csv");
-router.post('/csv', upload, async (req, res) => {
+router.post('/csv', tokenMiddleware, upload, async (req, res) => {
   try{
   const lines = await neatCsv(req.file.buffer);
 
@@ -101,10 +101,51 @@ router.get('/user', tokenMiddleware, async (req, res) => {
   }
 })
 
-router.put('/user/collection/add/:id', tokenMiddleware, async (req, res) => {
+router.post('/user', tokenMiddleware, async (req, res) => {
   try{
     const userInfo = await getUserInfo(req.token);
+    await saveUserData(userInfo.sub, req.body);
+    const newData = await getUserData(userInfo.sub);
+    return res.send(newData);
+  }catch(e){
+    return res.status(400).send(e.message);
+  }
+})
+
+router.put('/user/collection/add/:id', tokenMiddleware, async (req, res) => {
+  try{
+    const id = req.params.id;
+    const userInfo = await getUserInfo(req.token);
     const userData = await getUserData(userInfo.sub);
+    // Make sure it's not in the collection already. If it is, return the collection
+    const exists = userData.collection.find(x => x.id == id)
+    if(exists){
+      return res.send(userData)
+    }
+    // Otherwise store the id in the collection and save userData
+    userData.collection.push({ id, tags:[] })
+    await saveUserData(userInfo.sub, userData)
+    // return the resulting userData object with the new item
+    return res.send(userData);
+  }catch(e){
+    return res.status(400).send(e.message);
+  }
+})
+
+router.put('/user/collection/remove/:id', tokenMiddleware, async (req, res) => {
+  try{
+    const id = req.params.id;
+    const userInfo = await getUserInfo(req.token);
+    const userData = await getUserData(userInfo.sub);
+    // Make sure it's in the collection already. If it's not, return the collection as is
+    const idx = userData.collection.findIndex(x => x.id == id)
+    if(!idx < 0){
+      return res.send(userData)
+    }
+    // Otherwise remove the id in the collection and save userData
+    userData.collection.splice(idx, 1)
+    await saveUserData(userInfo.sub, userData)
+    // return the resulting userData object without the item
     return res.send(userData);
   }catch(e){
     return res.status(400).send(e.message);

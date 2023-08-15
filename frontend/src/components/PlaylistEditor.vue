@@ -1,6 +1,6 @@
 <template lang="pug">
 .playlist
-  draggable(v-model="playlist", item-key="id", :disabled="lock || tempoFocused")
+  draggable(v-model="set.tracks", item-key="id", :disabled="lock || tempoFocused")
     template(#item="{element, index}")
       track-display(
         :track="element",
@@ -26,15 +26,15 @@ import { useTransitionerStore } from "@/stores/transitioner";
 const props = defineProps<{ lock?: boolean }>();
 const store = useStore();
 const transStore = useTransitionerStore();
-const { playlist } = storeToRefs(store);
+const { set } = storeToRefs(store);
 defineEmits(["track-click"]);
 const tempoFocused = ref(false);
 const prev = computed(
-  () => (i: number) => i > 0 ? playlist.value[i - 1] : undefined
+  () => (i: number) => i > 0 ? set.value.tracks[i - 1] : undefined
 );
 const next = computed(
   () => (i: number) =>
-    i <= playlist.value.length - 1 ? playlist.value[i + 1] : undefined
+    i <= set.value.tracks.length - 1 ? set.value.tracks[i + 1] : undefined
 );
 </script>
 <style lang="scss" scoped>

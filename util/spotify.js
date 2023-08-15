@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getFromCache, storeInCache} from './cache.js'
+import Logger from './logger.js';
 
 const API = process.env.SPOTIFY || 'https://api.spotify.com/v1'
 
@@ -52,7 +53,7 @@ export async function generalSearch(token, query){
     headers: { 'Authorization': `Bearer ${token}` },
     params: { q: query, type: 'album' }
   })
-  if(!data.albums || !data.albums.items || !data.albums.items.length) return null;
+  if(!data?.albums?.items?.length) return null;
   return data.albums.items;
 }
 
@@ -84,8 +85,13 @@ export async function getAlbumData(token, artist, album){
 }
 
 export async function getToken(){
-  const { data } = await axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credentials', {
-  headers: { 'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64')) }
-  });
-  return data.access_token;
+  try{
+    const { data } = await axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credentials', {
+    headers: { 'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64')) }
+    });
+    return data.access_token;
+  }catch(e){
+   Logger.debug(e)
+   throw new Error("Failed to fetch token")
+  }
 }

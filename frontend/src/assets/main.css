@@ -19,6 +19,10 @@ a,
   }
 }
 
+.red-icon {
+  color: rgb(185, 0, 0);
+}
+
 /* @media (min-width: 1024px) {
   body {
     display: flex;

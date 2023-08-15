@@ -5,7 +5,7 @@
       h2(v-if="showCollection") Collection
       button(v-if="showCollection", @click="showSearch = !showSearch") Add Album
       button.caret(@click="showCollection = !showCollection") {{ showCollection? '‹': '›' }}
-    album-list(v-if="showCollection", :albums="albums", @track-click="addTrack", @album-delete="removeAlbum")
+    album-list(v-if="showCollection", :albums="hydratedCollection", @track-click="addTrack", @album-delete="removeAlbum")
   .editor
     .header
       button.caret(@click="showPlaylist = !showPlaylist") {{ showPlaylist? '›' : '‹' }}
@@ -26,7 +26,7 @@ import {
   useStore,
   type TrackClickEvent,
   type TrackData,
-  type AlbumData,
+  type EnhancedAlbum,
 } from "@/stores/store";
 import { formatDuration, getNewKey } from "@/utils";
 import { storeToRefs } from "pinia";
@@ -38,18 +38,26 @@ const showTransitioner = ref(false);
 const showCollection = ref(true);
 const showPlaylist = ref(true);
 const lockPlaylist = ref(false);
-const { albums, playlist } = storeToRefs(store);
+const { albums, set, userData } = storeToRefs(store);
+const hydratedCollection = computed(() =>
+  userData.value.collection.map((a) => {
+    const h = albums.value[a.id];
+    if (h) {
+      return { ...h, tags: a.tags } as EnhancedAlbum;
+    }
+  })
+);
 function addTrack(t: TrackClickEvent) {
   store.addTrack(t.track);
 }
 function removeTrack(t: TrackClickEvent) {
   store.removeTrack(t);
 }
-function removeAlbum(a: AlbumData) {
-  store.removeAlbum(a);
+function removeAlbum(a: EnhancedAlbum) {
+  store.removeFromCollection(a.id);
 }
 const setLength = computed(() =>
-  playlist.value.reduce((prev: number, track: TrackData) => {
+  set.value.tracks.reduce((prev: number, track: TrackData) => {
     return prev + (track.audioFeatures?.duration_ms || 0);
   }, 0)
 );

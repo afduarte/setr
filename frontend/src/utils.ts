@@ -142,3 +142,8 @@ api.interceptors.request.use(function (config) {
     })
     .catch((error) => Promise.reject(error));
 });
+
+export function truncate(str: string, size: number, ellipsis = "...") {
+  if (str.length <= size) return str;
+  return `${str.substring(0, size)}${ellipsis}`;
+}
