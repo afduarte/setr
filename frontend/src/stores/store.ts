@@ -146,7 +146,6 @@ export const useStore = defineStore("store", {
   },
   actions: {
     loadSet(s: Set) {
-      console.log("loading set");
       const tracks = s.tracks
         .map((t) => {
           if (!this.trackToAlbum[t.id]) return;
@@ -186,7 +185,6 @@ export const useStore = defineStore("store", {
       await this.getUserData();
     },
     async downloadCollection() {
-      console.log("downloading collection");
       const promises = this.userData.collection.map((album) => {
         if (!this.albums[album.id]) {
           album.tags.forEach((t) => (this.albumTags[t] = true));
@@ -233,12 +231,24 @@ export const useStore = defineStore("store", {
       this.userData = r.data;
       this.downloadCollection();
     },
-    // addTrack(t: TrackData) {
-    //   // Turn the track into an enhanced track so we persist notes and adjustment data
-    //   this.playlist.push({ ...t, note: "", adjustment: 0 });
-    // },
-    // removeTrack(t: TrackClickEvent) {
-    //   this.playlist.splice(t.index, 1);
-    // },
+    async addTrack(t: TrackData) {
+      // Turn the track into an enhanced track so we persist notes and adjustment data
+      this.set.tracks.push({ ...t, note: "", adjustment: 0 });
+      this.updateMetaSet();
+    },
+    async removeTrack(t: TrackClickEvent) {
+      this.set.tracks.splice(t.index, 1);
+      this.updateMetaSet();
+    },
+    async updateMetaSet() {
+      const idx = this.userData.sets.findIndex((x) => x.id == this.set.id);
+      if (idx < 0) return;
+      this.userData.sets[idx].tracks = this.set.tracks.map((et) => ({
+        id: et.id,
+        note: et.note,
+        adjustment: et.adjustment,
+      }));
+      this.saveUserData();
+    }
   },
 });
