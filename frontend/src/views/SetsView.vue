@@ -4,7 +4,7 @@ main
     h1 Saved Sets
   .sets
     set-card(v-for="s in userData.sets", :set="s", @edit-click="router.push('/app/set/'+s.id)")
-    set-card(:set="null", @click="addSet")
+    set-card(:set="null", @click="store.addSet")
 </template>
 <script setup lang="ts">
 import { useStore } from "@/stores/store";
@@ -13,7 +13,7 @@ import { useRouter } from "vue-router";
 import SetCard from "@/components/SetCard.vue";
 
 const store = useStore();
-const { userData, addSet } = storeToRefs(store);
+const { userData } = storeToRefs(store);
 const router = useRouter();
 </script>
 <style lang="scss" scoped>

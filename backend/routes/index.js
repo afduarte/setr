@@ -4,6 +4,8 @@ import neatCsv from 'neat-csv';
 import {specificAlbumGet, generalSearch, getToken, searchArtistAlbum, } from '../util/spotify.js'
 import { downloadYoutube, searchYoutube } from '../util/youtube.js';
 import { getUserInfo, tokenMiddleware, getUserData, saveUserData } from '../util/user.js';
+import Logger from '../util/logger.js';
+import { generateSetId, generateSetName } from '../util/helpers.js';
 
 
 
@@ -146,6 +148,26 @@ router.put('/user/collection/remove/:id', tokenMiddleware, async (req, res) => {
     userData.collection.splice(idx, 1)
     await saveUserData(userInfo.sub, userData)
     // return the resulting userData object without the item
+    return res.send(userData);
+  }catch(e){
+    return res.status(400).send(e.message);
+  }
+})
+
+router.post('/user/set/new', tokenMiddleware, async (req, res) => {
+  try{
+    const userInfo = await getUserInfo(req.token);
+    const userData = await getUserData(userInfo.sub);
+    // generate the new set with placeholder data and created = now()
+    const newSet = {
+      id: generateSetId(),
+      created: Date.now(),
+      name: generateSetName(),
+      tracks: []
+    }
+    userData.sets.push(newSet)
+    await saveUserData(userInfo.sub, userData)
+    // return the resulting userData object with the new set
     return res.send(userData);
   }catch(e){
     return res.status(400).send(e.message);
