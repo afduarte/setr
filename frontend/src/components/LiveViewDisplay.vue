@@ -1,11 +1,10 @@
 <template lang="pug">
 .album-wrapper
-  p.cross(@click="$emit('cross-click')") ❌
-  .album(v-if="isMissingAlbum")
+  .album(v-if="!current")
     .info
       img(:src="placeHolder")
-      p {{ album }}
-  .album(v-else, @click="isExpanded = !isExpanded", :title="artistNames + ' - ' + album.name")
+      p Select a song to start
+  .album(v-else, :title="artistNames + ' - ' + current.name")
     .info(v-if="!isExpanded")
       img(:src="image")
       .details
@@ -14,32 +13,45 @@
           p {{ truncate(album.name, 60) }} ({{ album.release_date.split("-").shift() }})
         .tags
           tags-input(@click.stop="", :tags="album.tags", @input="$emit('tags-changed')")
-    .tracks(v-if="isExpanded")
-      collection-track-display(v-if="isExpanded", v-for="(t,i) in album.tracks", :track="t")
+  .suggestions
+    .search
+      input(type="text", placeholder="Song search...", @input="liveStore.songSearch($event.target.value)")
 
 </template>
 <script setup lang="ts">
 import placeHolderURL from "@/assets/placeholder.png";
 import CollectionTrackDisplay from "./CollectionTrackDisplay.vue";
 import TagsInput from "./TagsInput.vue";
-import type { EnhancedAlbum } from "@/stores/store";
-import { computed, ref, type PropType } from "vue";
+import {
+  useStore,
+  type EnhancedAlbum,
+  type EnhancedSet,
+  type EnhancedTrack,
+} from "@/stores/store";
+import { computed, ref, type PropType, type Prop } from "vue";
 import { truncate } from "@/utils";
 import AlbumList from "./AlbumList.vue";
-defineEmits(["track-click"]);
+import { useLiveStore } from "@/stores/liveStore";
+defineEmits(["next-click", "track-click", "search"]);
 const props = defineProps({
-  album: {} as PropType<EnhancedAlbum | string>,
-  hideTracks: Boolean,
+  current: {} as PropType<EnhancedTrack>,
+  next: [] as PropType<EnhancedTrack[]>,
+  albums: [] as PropType<EnhancedAlbum[]>,
 });
+const store = useStore();
+const liveStore = useLiveStore();
 const isExpanded = ref(false);
-const isMissingAlbum = computed(() => typeof props?.album === "string");
+const liveSet = ref(Set);
 const image = computed(() => {
-  const a = props.album as EnhancedAlbum;
-  return a?.images?.find((i) => !!i)?.url ?? "@/assets/placeholder.png";
+  const c = props.current as EnhancedTrack;
+  const albumId = store.getAlbumIdForTrack(c.id);
+  if (!albumId) return placeHolder.value;
+  const a = props.albums?.find((x) => x.id == albumId);
+  return a?.images?.find((i) => !!i)?.url ?? placeHolder.value;
 });
 const artistNames = computed(() => {
-  const a = props.album as EnhancedAlbum;
-  return a?.artists?.map((a) => a.name).join(", ");
+  const c = props.current as EnhancedTrack;
+  return c?.artists?.map((a) => a.name).join(", ") ?? "Unknown";
 });
 const placeHolder = computed(() => placeHolderURL);
 </script>
@@ -89,12 +101,14 @@ const placeHolder = computed(() => placeHolderURL);
 .cross {
   cursor: pointer;
 }
+
+
 </style>
 <style scoped>
 .album-wrapper {
   border-top: 1px solid var(--color-text);
   padding-top: 5px;
   display: grid;
-  grid-template-columns: 2fr 45fr;
+  grid-template-columns: 4fr 6fr;
 }
 </style>

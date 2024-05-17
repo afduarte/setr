@@ -52,7 +52,10 @@ export function generateSetId() {
 const adjectives = ['Ambient', 'Astral', 'Captivating', 'Celestial', 'Cosmic', 'Electric', 'Enchanted', 'Enigmatic', 'Enveloping', 'Ethereal', 'Euphoric', 'Harmonic', 'Harmonious', 'Hypersonic', 'Hypnotic', 'Illuminated', 'Infinite', 'Luminous', 'Lush', 'Melodic', 'Mesmeric', 'Mystical', 'Radiant', 'Seraphic', 'Serene', 'Sonic', 'Sublime', 'Timeless', 'Tranquil', 'Transcendent', 'Vibrant', 'Vibrational']
 const nouns = ['Adventure', 'Alchemy', 'Ambiance', 'Beats', 'Bliss', 'Cadence', 'Dreamscape', 'Echo', 'Echoes', 'Enchantment', 'Exploration', 'Frequencies', 'Fusion', 'Groove', 'Harmonies', 'Harmony', 'Illumination', 'Journey', 'Melodies', 'Mirage', 'Nocturne', 'Odyssey', 'Radiance', 'Reflections', 'Resonance', 'Reverberations', 'Reverie', 'Rhythms', 'Serenade', 'Serenity', 'Sonic', 'Soundscapes', 'Soundwaves', 'Transcendence', 'Voyage', 'Waves', 'Whispers']
 
-export function generateSetName() {
+export function generateSetName(dateName) {
+  if(dateName){
+    return new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+  }
   const adj = adjectives[Math.floor(Math.random()*adjectives.length)];
   const noun = nouns[Math.floor(Math.random()*nouns.length)];
   return `${adj} ${noun}`

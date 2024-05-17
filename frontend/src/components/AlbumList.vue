@@ -3,14 +3,14 @@
   .holder(v-for="(a, idx) in sortedAlbums")
     .letter
       h2(v-if="isFirstOfLetter(a, idx)") {{ getLetter(a) }}
-    album-display(:album="a", @track-click="$emit('track-click', $event)", @cross-click="$emit('album-delete', a)")
+    album-display(:album="a", @track-click="$emit('track-click', $event)", @cross-click="$emit('album-delete', a)", @tags-changed="$emit('user-save')")
 </template>
 <script setup lang="ts">
 import AlbumDisplay from "./AlbumDisplay.vue";
 import { getSortingString, type EnhancedAlbum } from "@/stores/store";
 import { computed } from "vue";
 const props = defineProps<{ albums?: (EnhancedAlbum | string)[] }>();
-defineEmits(["track-click", "album-delete"]);
+defineEmits(["track-click", "album-delete", "user-save"]);
 const sortedAlbums = computed(() => {
   if (!props?.albums) return [];
   return [...props.albums].sort((a, b) => {

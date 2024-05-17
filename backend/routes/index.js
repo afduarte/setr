@@ -162,8 +162,8 @@ router.post('/user/set/new', tokenMiddleware, async (req, res) => {
     const newSet = {
       id: generateSetId(),
       created: Date.now(),
-      name: generateSetName(),
-      tracks: []
+      name: generateSetName(!!req?.body?.tracks),
+      tracks: req?.body?.tracks|| []
     }
     userData.sets.push(newSet)
     await saveUserData(userInfo.sub, userData)

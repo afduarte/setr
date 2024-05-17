@@ -4,7 +4,7 @@ main
     h1 Collection
     button(@click="showSearch = true") Add Album
   .grid
-    album-grid(:albums="hydratedCollection", @album-delete="store.removeFromCollection($event.id)")
+    album-grid(:albums="hydratedCollection", @album-delete="store.removeFromCollection($event.id)", @user-save="store.saveUserData")
 search-modal(:show="showSearch", @close="showSearch = false")
 </template>
 <script setup lang="ts">

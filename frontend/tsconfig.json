@@ -8,7 +8,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "lib": ["ES2017"]
+    "lib": ["ES2019"]
   },
 
   "references": [

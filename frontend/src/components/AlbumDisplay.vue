@@ -13,7 +13,7 @@
         p {{ artistNames }}
           p {{ album.name }} ({{ album.release_date.split("-").shift() }})
         .tags
-          tags-input(:tags="album.tags")
+          tags-input(:tags="album.tags", @input="$emit('tags-changed')")
     .tracks(v-if="!hideTracks")
       .banner(@click.stop="isExpanded = !isExpanded")
         p Tracks
@@ -28,7 +28,7 @@ import TagsInput from "./TagsInput.vue";
 import type { EnhancedAlbum } from "@/stores/store";
 import { computed, ref, type PropType } from "vue";
 import AlbumList from "./AlbumList.vue";
-defineEmits(["track-click"]);
+defineEmits(["track-click", "tags-changed"]);
 const props = defineProps({
   album: {} as PropType<EnhancedAlbum | string>,
   hideTracks: Boolean,

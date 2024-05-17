@@ -5,7 +5,7 @@
       h2(v-if="showCollection") Collection
       button(v-if="showCollection", @click="showSearch = !showSearch") Add Album
       button.caret(@click="showCollection = !showCollection") {{ showCollection? '‹': '›' }}
-    album-list(v-if="showCollection", :albums="hydratedCollection", @track-click="addTrack", @album-delete="removeAlbum")
+    album-list(v-if="showCollection", :albums="hydratedCollection", @track-click="addTrack", @album-delete="removeAlbum", @user-save="store.saveUserData")
   .editor
     .header
       button.caret(@click="showPlaylist = !showPlaylist") {{ showPlaylist? '›' : '‹' }}

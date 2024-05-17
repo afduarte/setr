@@ -8,6 +8,7 @@ import { authGuard } from "@auth0/auth0-vue";
 import { useStore } from "@/stores/store";
 import SetsView from "../views/SetsView.vue";
 import CollectionView from "../views/CollectionView.vue";
+import LiveViewVue from "@/views/LiveView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,6 +50,15 @@ const router = createRouter({
           path: "collection",
           name: "collection",
           component: CollectionView,
+          beforeEnter: async () => {
+            const store = useStore();
+            await store.getUserData();
+          },
+        },
+        {
+          path: "live",
+          name: "live",
+          component: LiveViewVue,
           beforeEnter: async () => {
             const store = useStore();
             await store.getUserData();

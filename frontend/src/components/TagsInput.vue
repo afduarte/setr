@@ -7,7 +7,8 @@
     :sources="tagsList"
     :allowPaste="{delimiter: ','}"
     :allowDuplicates="false",
-    :theme="colours"
+    :theme="colours",
+    :on-changed="(a,b,c) => console.log(a,b,c)"
     )
 </template>
 <script setup lang="ts">
@@ -16,6 +17,7 @@ import { storeToRefs } from "pinia";
 import { SmartTagz } from "smart-tagz";
 import "smart-tagz/dist/smart-tagz.css";
 import { computed } from "vue";
+defineEmits(["input"]);
 const store = useStore();
 const { albumTags } = storeToRefs(store);
 const tagsList = computed(() => Object.values(albumTags.value));
@@ -24,6 +26,7 @@ const colours = {
   background: "var(--color-background-soft)",
   tagTextColor: "var(--color-text)",
 };
+// const tagsChanged = (a,b,c) => console.log(a,b,c)
 </script>
 <style lang="scss" scoped>
 .tags-main {

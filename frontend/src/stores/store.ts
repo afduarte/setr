@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { useLocalStorage } from "@vueuse/core";
+import { useStorage } from "@vueuse/core";
 import { api, getSpotifyIDFromURL } from "@/utils";
 
 export function getSortingString(a: EnhancedAlbum): string {
@@ -137,7 +137,7 @@ export const useStore = defineStore("store", {
     return {
       userData: {} as UserData,
       collection: [] as AlbumMeta[],
-      albums: useLocalStorage<{ [id: string]: AlbumData }>("albums", {}),
+      albums: useStorage<{ [id: string]: AlbumData }>("albums", {}),
       trackToAlbum: {} as { [track: string]: string },
       albumTags: {} as { [tag: string]: boolean },
       set: {} as EnhancedSet,
@@ -149,7 +149,7 @@ export const useStore = defineStore("store", {
       const tracks = s.tracks
         .map((t) => {
           if (!this.trackToAlbum[t.id]) return;
-          const album = this.albums[this.trackToAlbum[t.id]];
+          const album = this.albums.value[this.trackToAlbum[t.id]];
           if (!album) return;
           const track = album.tracks.find((x) => x.id == t.id);
           if (!track) return;
@@ -173,7 +173,7 @@ export const useStore = defineStore("store", {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      this.albums = data;
+      this.albums.value = data;
     },
     async getUserData() {
       const { data } = await api.get(`/user`);
@@ -185,14 +185,13 @@ export const useStore = defineStore("store", {
       await this.getUserData();
     },
     async downloadCollection() {
-      const promises = this.userData.collection.map((album) => {
-        if (!this.albums[album.id]) {
-          album.tags.forEach((t) => (this.albumTags[t] = true));
-          return this.addAlbum(album.id);
+      const promises = this.userData.collection.map((a) => {
+        const album = this.albums.value[a.id];
+        if (!album) {
+          a.tags.forEach((t) => (this.albumTags[t] = true));
+          return this.addAlbum(a.id);
         } else {
-          this.albums[album.id].tracks.forEach(
-            (t) => (this.trackToAlbum[t.id] = album.id)
-          );
+          album.tracks.forEach((t) => (this.trackToAlbum[t.id] = album.id));
           return Promise.resolve();
         }
       });
@@ -214,11 +213,12 @@ export const useStore = defineStore("store", {
       this.searchResults = [];
     },
     async addSet() {
-      // not implemented
+      const { data } = await api.post<UserData>(`/user/set/new`);
+      this.userData = data;
     },
     async addAlbum(id: string) {
       const { data } = await api.get<AlbumData>(`/album-by-id/${id}`);
-      this.albums[data.id] = data;
+      this.albums.value[data.id] = data;
       data.tracks.forEach((t) => (this.trackToAlbum[t.id] = data.id));
     },
     async addToCollection(id: string) {
@@ -249,6 +249,19 @@ export const useStore = defineStore("store", {
         adjustment: et.adjustment,
       }));
       this.saveUserData();
-    }
+    },
+  },
+  getters: {
+    getAlbumIdForTrack(state) {
+      return (trackId: string) => state.trackToAlbum[trackId];
+    },
+    allTracks(state) {
+      return Object.values(state.albums.value)
+        .flatMap((a) => a.tracks)
+        .reduce((acc, next) => {
+          acc[next.id] = next;
+          return acc;
+        }, {} as { [id: string]: TrackData });
+    },
   },
 });
