@@ -1,0 +1,11 @@
+@import './base.css';
+
+#app {
+  margin: 0 3%;
+
+  font-weight: normal;
+}
+
+.red-icon {
+  color: rgb(185, 0, 0);
+}

@@ -149,7 +149,7 @@ export const useStore = defineStore("store", {
       const tracks = s.tracks
         .map((t) => {
           if (!this.trackToAlbum[t.id]) return;
-          const album = this.albums.value[this.trackToAlbum[t.id]];
+          const album = this.albums[this.trackToAlbum[t.id]];
           if (!album) return;
           const track = album.tracks.find((x) => x.id == t.id);
           if (!track) return;
@@ -173,7 +173,7 @@ export const useStore = defineStore("store", {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      this.albums.value = data;
+      this.albums = data;
     },
     async getUserData() {
       const { data } = await api.get(`/user`);
@@ -185,9 +185,13 @@ export const useStore = defineStore("store", {
       await this.getUserData();
     },
     async downloadCollection() {
+      console.log('downloading collection')
       const promises = this.userData.collection.map((a) => {
-        const album = this.albums.value[a.id];
+        console.log(`checking album (${a.id})`, a)
+        if(!this.albums) throw new Error('albums not initialised')
+        const album = this.albums[a.id];
         if (!album) {
+          console.log('')
           a.tags.forEach((t) => (this.albumTags[t] = true));
           return this.addAlbum(a.id);
         } else {
@@ -218,7 +222,7 @@ export const useStore = defineStore("store", {
     },
     async addAlbum(id: string) {
       const { data } = await api.get<AlbumData>(`/album-by-id/${id}`);
-      this.albums.value[data.id] = data;
+      this.albums[data.id] = data;
       data.tracks.forEach((t) => (this.trackToAlbum[t.id] = data.id));
     },
     async addToCollection(id: string) {

@@ -45,6 +45,7 @@ const router = createRouter({
               (s: Set) => s.id == to.params.id,
             );
             if (!set) return false;
+            await store.downloadCollection();
             store.loadSet(set);
           },
         },
@@ -55,6 +56,7 @@ const router = createRouter({
           beforeEnter: async () => {
             const store = useStore();
             await store.getUserData();
+            await store.downloadCollection();
           },
         },
         {
@@ -64,6 +66,7 @@ const router = createRouter({
           beforeEnter: async () => {
             const store = useStore();
             await store.getUserData();
+            await store.downloadCollection();
           },
         },
         {
@@ -83,6 +86,8 @@ const router = createRouter({
       name: "Logout",
       component: LoginView,
       beforeEnter: () => {
+        const store = useStore();
+        store.logout();
         auth0.logout({ logoutParams: { returnTo: import.meta.env.BASE_URL } });
         return { name: "Login" };
       },

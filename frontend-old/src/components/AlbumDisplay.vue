@@ -11,7 +11,7 @@
       .details
         .artist
         p {{ artistNames }}
-          span {{ album.name }} ({{ album.release_date.split("-").shift() }})
+          p {{ album.name }} ({{ album.release_date.split("-").shift() }})
         .tags
           tags-input(:tags="album.tags", @input="$emit('tags-changed')")
     .tracks(v-if="!hideTracks")
