@@ -20,10 +20,10 @@
         :disabled="locked"
       )
     p Key: {{ humaniseKey(adjustedKey, inner?.audioFeatures?.mode) }}
-    .transitioner
-      p Transitioner
-      button(:class="{active: track.id == transA?.id}", @click.stop="$emit('transitioner-a', track)") A
-      button(:class="{active: track.id == transB?.id}", @click.stop="$emit('transitioner-b', track)") B
+    //- .transitioner
+    //-   p Transitioner
+    //-   button(:class="{active: track.id == transA?.id}", @click.stop="$emit('transitioner-a', track)") A
+    //-   button(:class="{active: track.id == transB?.id}", @click.stop="$emit('transitioner-b', track)") B
     p(:contenteditable="!locked", @input="inner.note = $event.target.innerText") {{ inner.note }}
   p.camelot(:style="camelotStyle(adjustedKey, inner?.audioFeatures?.mode)") 
     b {{ camelotNumber(adjustedKey, inner?.audioFeatures?.mode) }}
@@ -140,7 +140,7 @@ function controlledEmit(evt: any, ...args: any[]) {
   }
   .track {
     display: grid;
-    grid-template-columns: 2fr 15fr 3fr 10fr 6fr 5fr 10fr;
+    grid-template-columns: 2fr 15fr 3fr 10fr 4fr 10fr;
     align-items: center;
 
     .tempo {

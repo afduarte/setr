@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
-import { useStorage } from "@vueuse/core";
 import { api, getSpotifyIDFromURL } from "@/utils";
 
 export function getSortingString(a: EnhancedAlbum): string {
+  if(!a.artists) return a.name.replace(/^\d/, "#");
   const artist = a.artists
     .map((a) =>
       a.name
@@ -116,7 +116,9 @@ export type AlbumMeta = {
   tags: string[];
 };
 
-export type EnhancedAlbum = AlbumData & AlbumMeta;
+export type EnhancedAlbum = AlbumData & {
+  tags: string[];
+};
 
 export type Set = {
   id: string;
@@ -128,7 +130,7 @@ export type Set = {
 export type EnhancedSet = Set & { tracks: EnhancedTrack[] };
 
 export type UserData = {
-  collection: AlbumMeta[];
+  collection: EnhancedAlbum[];
   sets: Set[];
 };
 
@@ -136,10 +138,9 @@ export const useStore = defineStore("store", {
   state() {
     return {
       userData: {} as UserData,
-      collection: [] as AlbumMeta[],
-      albums: useStorage<{ [id: string]: AlbumData }>("albums", {}),
+      albums: {} as { [id: string]: EnhancedAlbum },
       trackToAlbum: {} as { [track: string]: string },
-      albumTags: {} as { [tag: string]: boolean },
+      albumTags: new Set<string>(),
       set: {} as EnhancedSet,
       searchResults: [] as AlbumData[],
     };
@@ -148,8 +149,9 @@ export const useStore = defineStore("store", {
     loadSet(s: Set) {
       const tracks = s.tracks
         .map((t) => {
-          if (!this.trackToAlbum[t.id]) return;
-          const album = this.albums[this.trackToAlbum[t.id]];
+          const albumId = this.trackToAlbum[t.id];
+          if (!albumId) return;
+          const album = this.albums[albumId];
           if (!album) return;
           const track = album.tracks.find((x) => x.id == t.id);
           if (!track) return;
@@ -166,7 +168,7 @@ export const useStore = defineStore("store", {
     async uploadCSV(f: File) {
       const formData = new FormData();
       formData.append("csv", f);
-      const { data } = await api.post<{ [id: string]: AlbumData }>(
+      const { data } = await api.post<{ [id: string]: EnhancedAlbum }>(
         `/csv`,
         formData,
         {
@@ -176,31 +178,44 @@ export const useStore = defineStore("store", {
       this.albums = data;
     },
     async getUserData() {
-      const { data } = await api.get(`/user`);
+      const { data } = await api.get(`/user`, {
+        params: { c: true },
+      });
       this.userData = data;
-      this.downloadCollection();
+      this.processHydratedCollection();
+    },
+    processHydratedCollection() {
+      if (!this.userData.collection) return;
+      this.userData.collection.forEach((album: EnhancedAlbum) => {
+        // Store the album data
+        this.albums[album.id] = album;
+        // Update the track-to-album mapping
+        album.tracks.forEach((track) => {
+          this.trackToAlbum[track.id] = album.id;
+        });
+        // Store album tags
+        album.tags.forEach((tag) => {
+          this.albumTags.add(tag);
+        });
+      });
     },
     async saveUserData() {
-      await api.post(`/user`, this.userData);
+      // Dehydrate the collection by extracting only 'id' and 'tags'
+      const collection = this.userData.collection.map((album) => ({
+        id: album.id,
+        tags: album.tags,
+      }));
+    
+      // Send the dehydrated userData to the server
+      await api.post(`/user`, {sets: this.userData.sets, collection});
+    
+      // Fetch the updated userData from the server
       await this.getUserData();
     },
-    async downloadCollection() {
-      console.log('downloading collection')
-      const promises = this.userData.collection.map((a) => {
-        console.log(`checking album (${a.id})`, a)
-        if(!this.albums) throw new Error('albums not initialised')
-        const album = this.albums[a.id];
-        if (!album) {
-          console.log('')
-          a.tags.forEach((t) => (this.albumTags[t] = true));
-          return this.addAlbum(a.id);
-        } else {
-          album.tracks.forEach((t) => (this.trackToAlbum[t.id] = album.id));
-          return Promise.resolve();
-        }
-      });
-      await Promise.all(promises);
-    },
+    // Remove or comment out downloadCollection if it's no longer needed
+    // async downloadCollection() {
+    //   // No longer necessary since collection is hydrated
+    // },
     async search(q: string) {
       if (q.includes("spotify")) {
         const id = getSpotifyIDFromURL(q);
@@ -217,23 +232,27 @@ export const useStore = defineStore("store", {
       this.searchResults = [];
     },
     async addSet() {
-      const { data } = await api.post<UserData>(`/user/set/new`);
+      const { data } = await api.post<UserData>(`/user/set/new?c=treu`);
       this.userData = data;
+      this.processHydratedCollection();
     },
     async addAlbum(id: string) {
       const { data } = await api.get<AlbumData>(`/album-by-id/${id}`);
-      this.albums[data.id] = data;
+      this.albums[data.id] = {...data, tags: []};
       data.tracks.forEach((t) => (this.trackToAlbum[t.id] = data.id));
     },
     async addToCollection(id: string) {
-      const { data } = await api.put<UserData>(`/user/collection/add/${id}`);
+      const { data } = await api.put<UserData>(`/user/collection/add/${id}?c=true`);
       this.userData = data;
-      this.downloadCollection();
+      this.processHydratedCollection();
     },
     async removeFromCollection(id: string) {
-      const r = await api.put<UserData>(`/user/collection/remove/${id}`);
-      this.userData = r.data;
-      this.downloadCollection();
+      const { data } = await api.put<UserData>(`/user/collection/remove/${id}?c=true`);
+      this.userData = data;
+      // Remove the album from the albums store
+      const album = this.albums[id];
+      album.tracks.forEach(t => delete this.trackToAlbum[t.id])
+      delete this.albums[id];
     },
     async addTrack(t: TrackData) {
       // Turn the track into an enhanced track so we persist notes and adjustment data
@@ -252,7 +271,7 @@ export const useStore = defineStore("store", {
         note: et.note,
         adjustment: et.adjustment,
       }));
-      this.saveUserData();
+      await this.saveUserData();
     },
   },
   getters: {

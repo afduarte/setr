@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import neatCsv from 'neat-csv';
-import {specificAlbumGet, generalSearch, getToken, searchArtistAlbum, } from '../util/spotify.js'
+import {specificAlbumGet, generalSearch, getToken, searchArtistAlbum, getCollection } from '../util/spotify.js'
 import { downloadYoutube, searchYoutube } from '../util/youtube.js';
 import { getUserInfo, tokenMiddleware, getUserData, saveUserData } from '../util/user.js';
 import Logger from '../util/logger.js';
@@ -31,8 +31,11 @@ router.get('/album-by-id/:id', async (req, res) => {
   const token = await getToken();
   const id = req.params.id
   try {
+    const userInfo = await getUserInfo(req.token);
+    const userData = await getUserData(userInfo.sub);
     const data = await specificAlbumGet(token, id);
-    return res.send(data);
+    const collectionItem = userData.collection.find(x => x.id == id)
+    return res.send({...data, tags: (collectionItem?.tags ?? [])});
   } catch (e) {
     return res.status(404).send(e.message);
   }
@@ -94,14 +97,25 @@ router.post('/csv', tokenMiddleware, upload, async (req, res) => {
 
 // Collection
 router.get('/user', tokenMiddleware, async (req, res) => {
-  try{
+  try {
     const userInfo = await getUserInfo(req.token);
     const userData = await getUserData(userInfo.sub);
+
+    if (req.query.c === 'true') {
+      const token = await getToken();
+
+      // Use the getCollection method to hydrate the collection
+      const hydratedCollection = await getCollection(token, userData.collection);
+
+      // Replace the collection with the hydrated collection
+      userData.collection = hydratedCollection;
+    }
+
     return res.send(userData);
-  }catch(e){
+  } catch (e) {
     return res.status(400).send(e.message);
   }
-})
+});
 
 router.post('/user', tokenMiddleware, async (req, res) => {
   try{
@@ -119,6 +133,15 @@ router.put('/user/collection/add/:id', tokenMiddleware, async (req, res) => {
     const id = req.params.id;
     const userInfo = await getUserInfo(req.token);
     const userData = await getUserData(userInfo.sub);
+    if (req.query.c === 'true') {
+      const token = await getToken();
+
+      // Use the getCollection method to hydrate the collection
+      const hydratedCollection = await getCollection(token, userData.collection);
+
+      // Replace the collection with the hydrated collection
+      userData.collection = hydratedCollection;
+    }
     // Make sure it's not in the collection already. If it is, return the collection
     const exists = userData.collection.find(x => x.id == id)
     if(exists){
@@ -139,6 +162,15 @@ router.put('/user/collection/remove/:id', tokenMiddleware, async (req, res) => {
     const id = req.params.id;
     const userInfo = await getUserInfo(req.token);
     const userData = await getUserData(userInfo.sub);
+    if (req.query.c === 'true') {
+      const token = await getToken();
+
+      // Use the getCollection method to hydrate the collection
+      const hydratedCollection = await getCollection(token, userData.collection);
+
+      // Replace the collection with the hydrated collection
+      userData.collection = hydratedCollection;
+    }
     // Make sure it's in the collection already. If it's not, return the collection as is
     const idx = userData.collection.findIndex(x => x.id == id)
     if(!idx < 0){

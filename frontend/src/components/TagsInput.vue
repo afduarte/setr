@@ -20,7 +20,7 @@ import { computed } from "vue";
 defineEmits(["input"]);
 const store = useStore();
 const { albumTags } = storeToRefs(store);
-const tagsList = computed(() => Object.values(albumTags.value));
+const tagsList = computed(() => [...albumTags.value]);
 const colours = {
   primary: "var(--color-primary)",
   background: "var(--color-background-soft)",

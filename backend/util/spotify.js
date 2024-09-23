@@ -7,6 +7,18 @@ const API = process.env.SPOTIFY || 'https://api.spotify.com/v1'
 const client_id = 'd185711092bf486090bc56a9a58dce0a';
 const client_secret = '959e05d7dd414f2e8929b4d11ef1446e';
 
+export async function getCollection(token, collection) {
+  return await Promise.all(collection.map(async (item) => {
+    try {
+      const albumData = await specificAlbumGet(token, item.id);
+      return { ...albumData, tags: item.tags || [] };
+    } catch (e) {
+      throw new Error(`Failed to fetch album data for ID ${item.id}: ${e.message}`);
+      return { ...item, error: e.message };
+    }
+  }));
+}
+
 export async function specificAlbumGet(token, id){
   const cached = await getFromCache(id);
   if(cached) return cached;
