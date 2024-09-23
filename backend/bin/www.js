@@ -6,21 +6,26 @@
 
 import app from '../app.js';
 import debug from 'debug'
+import https from 'https';
 import http from 'http';
+import fs from 'fs';
 
-debug('playlistify:server');
+debug('setr:server');
 /**
  * Get port from environment and store in Express.
  */
-
-var port = normalizePort(process.env.PORT || '3000');
+var HTTPS = process.env.HTTPS !== 'false'
+var defaultPort = HTTPS ? '443' : '3000'
+var port = normalizePort(process.env.PORT || defaultPort);
 app.set('port', port);
 
 /**
- * Create HTTP server.
+ * Create server.
  */
-
-var server = http.createServer(app);
+var server = HTTPS ? https.createServer({
+  key: fs.readFileSync(process.env.SSL_KEY || 'privatekey.pem'),
+  cert: fs.readFileSync(process.env.SSL_CERT || 'certificate.pem')
+}, app) : http.createServer(app)
 
 /**
  * Listen on provided port, on all network interfaces.

@@ -1,3 +1,7 @@
+import { createAuth0, useAuth0 } from "@auth0/auth0-vue";
+import axios from "axios";
+import type { TrackData } from "./stores/store";
+
 export function formatDuration(ms: number) {
   const secs = ms / 1000;
   const hours = Math.floor(secs / 3600);
@@ -115,7 +119,59 @@ export function getNewKey(key: number, drift: number) {
   return (newKey + 11) % 11;
 }
 
+// Util function to get the circleOfFifths/camelotWheel distance 2 keys are from each other
+export function getRelativeMajor(key: number, mode: number) {
+  return mode === 1 ? key : (key + 3) % 12;
+}
+
+export const circleOfFifths = [0, 7, 2, 9, 4, 11, 6, 1, 8, 3, 10, 5];
+export function harmonicDistance(a: TrackData, b: TrackData) {
+  if (!a?.audioFeatures?.key || !b?.audioFeatures?.key){
+    return Number.MAX_SAFE_INTEGER;
+  }
+  const keyA = a.audioFeatures.key;
+  const keyB = b.audioFeatures.key;
+  // a value for mode is always present when a value for key is present
+  const modeA = a.audioFeatures!.mode;
+  const modeB = b.audioFeatures!.mode;
+
+  // Get the keys as their relative major so we don't have to consider minor keys
+  const majorKeyA = getRelativeMajor(keyA, modeA);
+  const majorKeyB = getRelativeMajor(keyB, modeB);
+
+  // Calculate the harmonic distance
+  const positionA = circleOfFifths[majorKeyA % 12];
+  const positionB = circleOfFifths[majorKeyB % 12];
+  const distance = Math.abs(positionA - positionB);
+  return Math.min(distance, 12 - distance); // Circular distance
+}
+
 export function getSpotifyIDFromURL(s: string) {
   // https://open.spotify.com/album/{id}
   return s.split("/").pop();
+}
+
+// Create a shared auth0 client instance
+export const auth0 = createAuth0({
+  domain: "setr.uk.auth0.com",
+  clientId: "qbA6LQKWUmclCFyjqYfJSfH6Wr5RVFST",
+  authorizationParams: { redirect_uri: window.location.origin },
+});
+
+export const api = axios.create({ baseURL: "/api" });
+// Add a request interceptor to add the token for every request
+api.interceptors.request.use(function (config) {
+  const origConfig = config;
+  return auth0
+    .getAccessTokenSilently()
+    .then((token) => {
+      origConfig.headers.Authorization = `Bearer ${token}`;
+      return Promise.resolve(origConfig);
+    })
+    .catch((error) => Promise.reject(error));
+});
+
+export function truncate(str: string, size: number, ellipsis = "...") {
+  if (str.length <= size) return str;
+  return `${str.substring(0, size)}${ellipsis}`;
 }
