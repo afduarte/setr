@@ -1,10 +1,10 @@
 {
-  "name": "playlistify",
+  "name": "backend",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node ./bin/www.js"
+    "dev": "HTTPS=false node ./bin/www.js"
   },
   "dependencies": {
     "audioconcat": "^0.1.4",
