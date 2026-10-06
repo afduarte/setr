@@ -1,0 +1,292 @@
+
+================================================================================
+🎵 SET: MAISON
+📅 Created: 3/26/2023
+🎵 Tracks: 16
+================================================================================
+
+ 1. Justice - Genesis
+    Album: † (Anniversary Edition)
+    Duration: 3:55
+    🔗 https://open.spotify.com/track/4x1vldfO4xNZtH32pSDrjq
+
+ 2. Justice - Let There Be Light
+    Album: † (Anniversary Edition)
+    Duration: 4:56
+    📝 Note: This is the end of genesis, track not actually played
+    🔗 https://open.spotify.com/track/5LynkjCwTE4qrXqEkJnGZ6
+
+ 3. Daft Punk - Aerodynamic
+    Album: Discovery
+    Duration: 3:33
+    🎛️  Adjustment: +0.5
+    🔗 https://open.spotify.com/track/3H3cOQ6LBLSvmcaV7QkZEu
+
+ 4. Daft Punk - Aerodynamite
+    Album: Aerodynamic
+    Duration: 7:48
+    📝 Note: start at +1, bring to +2
+    🎛️  Adjustment: +1
+    🔗 https://open.spotify.com/track/1Z1lRAs3IkySfpJrf9J1VW
+
+ 5. Justice - Phantom
+    Album: † (Anniversary Edition)
+    Duration: 4:22
+    🔗 https://open.spotify.com/track/0cHOHH7odBOmgr3raeaHzn
+
+ 6. Justice - Phantom Pt. II
+    Album: † (Anniversary Edition)
+    Duration: 3:21
+    🔗 https://open.spotify.com/track/4pC3y7iJhsHrZ0AU9t9hPF
+
+ 7. Justice, Simian - We Are Your Friends - Justice Vs Simian
+    Album: We Are Your Friends
+    Duration: 4:23
+    📝 Note: play saris e capolanas after this before fatboy slim
+    🔗 https://open.spotify.com/track/5f5RzlEgheGXEsYAvmYil8
+
+ 8. Fatboy Slim - Right Here, Right Now
+    Album: Right Here, Right Now
+    Duration: 5:54
+    📝 Note: Big Beat Royale, bring in about 1 min in when vocal starts
+    🔗 https://open.spotify.com/track/5VStG93vUGOHbHxM9gz6T1
+
+ 9. Daft Punk - Alive
+    Album: Homework
+    Duration: 5:16
+    📝 Note: start -3 bring up to 0 after start
+    🎛️  Adjustment: -3
+    🔗 https://open.spotify.com/track/1PH5Es89c1cENU8WVuWwbp
+
+10. Daft Punk - Technologic
+    Album: Human After All
+    Duration: 4:44
+    🔗 https://open.spotify.com/track/0LSLM0zuWRkEYemF7JcfEE
+
+11. Stardust, Benjamin Diamond, Alan Braxe, Thomas Bangalter - Music Sounds Better With You
+    Album: Music Sounds Better With You
+    Duration: 6:43
+    📝 Note: bring up to +3
+    🎛️  Adjustment: +3
+    🔗 https://open.spotify.com/track/303ccTay2FiDTZ9fZ2AdBt
+
+12. Soulsearcher - Can't Get Enough! - Vocal Club Mix
+    Album: Can't Get Enough
+    Duration: 6:53
+    📝 Note: start .5, bring up to 1.5
+    🔗 https://open.spotify.com/track/0qJDy1QsmmnZt343XTzxQd
+
+13. Daft Punk - Burnin'
+    Album: Homework
+    Duration: 6:54
+    🎛️  Adjustment: +3
+    🔗 https://open.spotify.com/track/6nSOhDfZOulWp0pnEHFrnn
+
+14. Justice - Stress
+    Album: † (Anniversary Edition)
+    Duration: 4:59
+    📝 Note: play the rest of the album
+    🎛️  Adjustment: +1
+    🔗 https://open.spotify.com/track/3cXWryalxeDlxDdybsE0s8
+
+15. Justice - Waters of Nazareth
+    Album: † (Anniversary Edition)
+    Duration: 4:25
+    📝 Note: fuck about with vocals from other songs,
+    🎛️  Adjustment: +1
+    🔗 https://open.spotify.com/track/71IzhN7H8ZkCIMotAjSHNk
+
+16. Justice - One Minute to Midnight
+    Album: † (Anniversary Edition)
+    Duration: 3:41
+    📝 Note: steam machine, right here right now, wu-tang pre-method man skit
+    🎛️  Adjustment: +1
+    🔗 https://open.spotify.com/track/1Vy5QWA1iVUa0KKIqMSfeY
+
+
+================================================================================
+🎵 SET: HYPERSONIC HARMONIES
+📅 Created: 9/14/2023
+🎵 Tracks: 25
+================================================================================
+
+ 1. Charli xcx - 360
+    Album: Brat and it’s the same but there’s three more songs so it’s not
+    Duration: 2:14
+    🔗 https://open.spotify.com/track/5wmv111MUsMc9yLb4gKwa6
+
+ 2. Dorian Electra - Career Boy
+    Album: Flamboyant
+    Duration: 3:37
+    📝 Note: 0 -> +2
+    🎛️  Adjustment: +2
+    🔗 https://open.spotify.com/track/7iDNyK13DY5SCtr1IPp1iZ
+
+ 3. King Gizzard & The Lizard Wizard - Set - Extended Mix
+    Album: The Silver Cord
+    Duration: 10:18
+    📝 Note: -2 -> 0 -> +16
+    🎛️  Adjustment: +16
+    🔗 https://open.spotify.com/track/0gEzX4ld6i2vOZg0hNeOIO
+
+ 4. Charli xcx - Club classics
+    Album: Brat and it’s the same but there’s three more songs so it’s not
+    Duration: 2:34
+    🔗 https://open.spotify.com/track/7KayrI8K161CtDn1qMiE0l
+
+ 5. Daft Punk - Technologic
+    Album: Human After All
+    Duration: 4:44
+    📝 Note: play during break in club classics
+    🎛️  Adjustment: +13
+    🔗 https://open.spotify.com/track/0LSLM0zuWRkEYemF7JcfEE
+
+ 6. Underworld - Born Slippy (Nuxx) - Radio Edit
+    Album: Born Slippy (Nuxx) [Radio Edit]
+    Duration: 4:24
+    📝 Note:  play during break, keep playing. 3 -> 1.5
+    🎛️  Adjustment: +3
+    🔗 https://open.spotify.com/track/3bUNyRrTFJDd4mqvUcb1Aa
+
+ 7. FKA twigs - Eusexua
+    Album: Eusexua
+    Duration: 4:24
+    🔗 https://open.spotify.com/track/2mjVDfu0JI19g4tso2iOag
+
+ 8. Sega Bodega - Dirt
+    Album: Dennis
+    Duration: 4:16
+    🔗 https://open.spotify.com/track/26cVsy0I8ZU9jIMCoROvPu
+
+ 9. Charli xcx - Everything is romantic
+    Album: Brat and it’s the same but there’s three more songs so it’s not
+    Duration: 3:23
+    🎛️  Adjustment: -2
+    🔗 https://open.spotify.com/track/7KfDVIj39efVUY57fzZm5b
+
+10. Buraka Som Sistema - Hangover (BaBaBa)
+    Album: Komba
+    Duration: 4:52
+    🔗 https://open.spotify.com/track/5ahjBQjEStlpiiMx114Odh
+
+11. cassö, RAYE, D-Block Europe - Prada
+    Album: Prada
+    Duration: 2:12
+    🔗 https://open.spotify.com/track/59NraMJsLaMCVtwXTSia8i
+
+12. Versatile, Eskimo Supreme, Casper Walsh - Blue Razz
+    Album: Blue Razz
+    Duration: 3:37
+    🔗 https://open.spotify.com/track/124GIso7hUD9of584dOOIo
+
+13. Babymorocco - Total Bass Of Your Heart
+    Album: The Sound
+    Duration: 1:46
+    🔗 https://open.spotify.com/track/0tQKEs11yc1DtKOGWQwXvp
+
+14. Fred again.., Baby Keem - leavemealone
+    Album: USB
+    Duration: 3:43
+    🔗 https://open.spotify.com/track/4AA57loUSZKtuHdULvizrc
+
+15. Charli xcx - Speed Drive
+    Album: Barbie The Album
+    Duration: 1:58
+    🔗 https://open.spotify.com/track/7GRv55NwkjxU2ysJLwzC9c
+
+16. Fred again.., Anderson .Paak, CHIKA - places to be
+    Album: places to be
+    Duration: 3:47
+    🔗 https://open.spotify.com/track/561pBFcFL2Pwb9HPO9tU8J
+
+17. BICEP - Glue
+    Album: Bicep
+    Duration: 4:29
+    🔗 https://open.spotify.com/track/2aJDlirz6v2a4HREki98cP
+
+18. Overmono - Good Lies
+    Album: Good Lies
+    Duration: 2:40
+    📝 Note: 3 -> 1
+    🎛️  Adjustment: +1
+    🔗 https://open.spotify.com/track/1ZnghCVtXCrtmKJH32z4UK
+
+19. Daft Punk - Too Long
+    Album: Discovery
+    Duration: 10:00
+    🔗 https://open.spotify.com/track/3zMvotMEQK3xvH01vA9wAP
+
+20. Faithless - Insomnia - Radio Edit
+    Album: 30 Years: Three Decades of Dance - Ministry of Sound - The Edit
+    Duration: 3:33
+    🔗 https://open.spotify.com/track/1NWRt8LtYmCzE1ziNvt07u
+
+21. Charli xcx - Von dutch
+    Album: Brat and it’s the same but there’s three more songs so it’s not
+    Duration: 2:44
+    🔗 https://open.spotify.com/track/0F5vlGJbkWrJcUjOH4PICl
+
+22. Robots In Disguise - The DJ's Got A Gun
+    Album: Get Rid!
+    Duration: 4:20
+    🔗 https://open.spotify.com/track/6DvtpGvCmEpqkt3Qd2b80o
+
+23. Haifa Wehbe - بدى عيش
+    Album: بدى عيش
+    Duration: 3:44
+    🔗 https://open.spotify.com/track/4xnVbLVPdDsTjHWpu9H4hk
+
+24. Ana Frango Elétrico - Electric Fish
+    Album: Me Chama De Gato Que Eu Sou Sua
+    Duration: 4:13
+    🔗 https://open.spotify.com/track/2i90BhQ6Mfvrd8yHRTHyZx
+
+25. Bronski Beat - Smalltown Boy
+    Album: The Age of Consent
+    Duration: 5:02
+    🔗 https://open.spotify.com/track/5vmRQ3zELMLUQPo2FLQ76x
+
+
+================================================================================
+🎵 SET: TRANSCENDENT SERENADE
+📅 Created: 2/9/2024
+🎵 Tracks: 5
+================================================================================
+
+ 1. Justice - Genesis
+    Album: † (Anniversary Edition)
+    Duration: 3:55
+    🔗 https://open.spotify.com/track/4x1vldfO4xNZtH32pSDrjq
+
+ 2. A Tribe Called Quest, Trugoy The Dove - Award Tour (feat. Trugoy The Dove)
+    Album: The Anthology
+    Duration: 3:28
+    🔗 https://open.spotify.com/track/0qOcGXEuXu66OQwWRyqFxD
+
+ 3. A Tribe Called Quest - Electric Relaxation
+    Album: The Anthology
+    Duration: 3:46
+    🔗 https://open.spotify.com/track/0eEXcw3JLVXcRxYrVYMy68
+
+ 4. A Tribe Called Quest - Buggin' Out
+    Album: The Anthology
+    Duration: 3:39
+    🔗 https://open.spotify.com/track/4FuuNmlafpFTE9UkcbrN9R
+
+ 5. A Tribe Called Quest - Can I Kick It?
+    Album: The Anthology
+    Duration: 4:25
+    🔗 https://open.spotify.com/track/7kpeL1x9j7uKgPx6rVz7D7
+
+
+================================================================================
+🎵 SET: CAPTIVATING FUSION
+📅 Created: 5/15/2024
+🎵 Tracks: 1
+================================================================================
+
+ 1. Charli xcx - 360
+    Album: Brat and it’s the same but there’s three more songs so it’s not
+    Duration: 2:14
+    🔗 https://open.spotify.com/track/5wmv111MUsMc9yLb4gKwa6
+
