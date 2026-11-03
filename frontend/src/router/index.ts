@@ -8,6 +8,7 @@ import { authGuard } from "@auth0/auth0-vue";
 import { useStore, type Set } from "@/stores/store";
 import SetsView from "../views/SetsView.vue";
 import CollectionView from "../views/CollectionView.vue";
+import ImportView from "../views/ImportView.vue";
 import LiveViewVue from "@/views/LiveView.vue";
 
 const router = createRouter({
@@ -55,6 +56,16 @@ const router = createRouter({
           beforeEnter: async () => {
             const store = useStore();
             await store.getUserData();
+          },
+        },
+        {
+          path: "import",
+          name: "import",
+          component: ImportView,
+          beforeEnter: async () => {
+            const store = useStore();
+            // Only need the collection ids here, not hydrated albums/tracks.
+            await store.getUserData(false);
           },
         },
         {

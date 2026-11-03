@@ -15,7 +15,9 @@ export function formatDuration(ms: number) {
   return (hours > 0 ? hours + ":" : "") + minutes + ":" + seconds;
 }
 
-// Spotify displays key as a number between 0 and 11 that represents the 12 keys starting on C
+// Key/mode come from AudioMuse as a note name + scale, already converted by the
+// backend to a pitch class 0-11 and mode (0 = minor, 1 = major) before they get
+// here, so the tables below stay the same.
 const keys = [
   "C", // 0
   "D♭", // 1
@@ -31,7 +33,7 @@ const keys = [
   "B", // 11
 ];
 export function formatKey(key: number, mode: number) {
-  if (key < 0 || key > keys.length - 1) return "N/A";
+  if (key === undefined || key === null || key < 0 || key > keys.length - 1) return "N/A";
   return `${keys[key]}`
     .split("/")
     .map((c) => c + (mode === 0 ? "m" : ""))
@@ -64,7 +66,7 @@ export function getCamelotColour(key: number, mode: number) {
   // 0 + 12 - 3 = 9 = A
   // This of course causes the opposite problem of causing an array out of bounds if the calculated index is not negative
   // To solve this we apply the modulus operator, which will return a value that's always within the array's bounds
-  // Finally, since we only need to apply this in case the mode is === 0 (Spotify's value for a minor key),
+  // Finally, since we only need to apply this in case the mode is === 0 (minor),
   // modeVal store the modifier. 3 if it is a minor key, 0 for major, which is then subtracted off of the key
   const modeVal = mode === 0 ? 3 : 0;
   const index = (key + camelotColours.length + modeVal) % camelotColours.length;
@@ -115,8 +117,8 @@ export function getPitchDrift(percent: number) {
 // Util function to get new key from pitch drift in one go
 export function getNewKey(key: number, drift: number) {
   const newKey = key + getPitchDrift(drift);
-  // Making sure the value is between 1 and 12
-  return (newKey + 11) % 11;
+  // Wrap into a pitch class 0-11 (there are 12 semitones, not 11)
+  return ((Math.round(newKey) % 12) + 12) % 12;
 }
 
 // Util function to get the circleOfFifths/camelotWheel distance 2 keys are from each other
@@ -126,14 +128,14 @@ export function getRelativeMajor(key: number, mode: number) {
 
 export const circleOfFifths = [0, 7, 2, 9, 4, 11, 6, 1, 8, 3, 10, 5];
 export function harmonicDistance(a: TrackData, b: TrackData) {
-  if (!a?.audioFeatures?.key || !b?.audioFeatures?.key){
+  if (a?.audioFeatures?.key == null || b?.audioFeatures?.key == null) {
     return Number.MAX_SAFE_INTEGER;
   }
   const keyA = a.audioFeatures.key;
   const keyB = b.audioFeatures.key;
-  // a value for mode is always present when a value for key is present
-  const modeA = a.audioFeatures!.mode;
-  const modeB = b.audioFeatures!.mode;
+  // mode is set alongside key by the backend; default to minor just in case
+  const modeA = a.audioFeatures.mode ?? 0;
+  const modeB = b.audioFeatures.mode ?? 0;
 
   // Get the keys as their relative major so we don't have to consider minor keys
   const majorKeyA = getRelativeMajor(keyA, modeA);
@@ -144,11 +146,6 @@ export function harmonicDistance(a: TrackData, b: TrackData) {
   const positionB = circleOfFifths[majorKeyB % 12];
   const distance = Math.abs(positionA - positionB);
   return Math.min(distance, 12 - distance); // Circular distance
-}
-
-export function getSpotifyIDFromURL(s: string) {
-  // https://open.spotify.com/album/{id}
-  return s.split("/").pop();
 }
 
 // Create a shared auth0 client instance

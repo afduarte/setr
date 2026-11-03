@@ -19,10 +19,20 @@ export const useLiveStore = defineStore("liveStore", {
   getters: {
     suggestions(state) {
       const store = useStore();
-      const tracks = Object.values(store.allTracks).map((track) => ({
-        track,
-        rank: rank(state.current, track, state.playedSongs),
-      }));
+      if (!state.current?.id) return [] as EnhancedTrack[];
+      return Object.values(store.allTracks)
+        .filter((track) => track.id !== state.current.id)
+        .map((track) => ({
+          track,
+          rank: rank(state.current, track, state.playedSongs),
+        }))
+        .sort((a, b) => a.rank - b.rank)
+        .slice(0, 50)
+        .map((x) => ({
+          ...(x.track as TrackData),
+          adjustment: 0,
+          note: "",
+        })) as EnhancedTrack[];
     },
   },
 });
@@ -38,11 +48,11 @@ function rank(a: TrackData, b: TrackData, playedSongs: EnhancedTrack[]) {
   const valenceWeight = 0.1;
   const playedPenalty = 10;
 
-  const bpmDiff = Math.abs(aFeatures.tempo - bFeatures?.tempo);
+  const bpmDiff = Math.abs((aFeatures.tempo ?? 0) - (bFeatures.tempo ?? 0));
   const harmonicDist = harmonicDistance(a, b);
-  const danceDiff = Math.abs(aFeatures.danceability - bFeatures.danceability);
-  const energyDiff = Math.abs(aFeatures.energy - bFeatures.energy);
-  const valenceDiff = Math.abs(aFeatures.valence - bFeatures.valence);
+  const danceDiff = Math.abs((aFeatures?.danceability ?? 0) - (bFeatures?.danceability ?? 0));
+  const energyDiff = Math.abs((aFeatures?.energy ?? 0) - (bFeatures?.energy ?? 0));
+  const valenceDiff = Math.abs((aFeatures?.valence ?? 0) - (bFeatures?.valence ?? 0));
   const played = playedSongs.find((x) => x.id == b.id) ? playedPenalty : 0;
 
   return (

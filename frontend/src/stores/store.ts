@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { api, getSpotifyIDFromURL } from "@/utils";
+import { api } from "@/utils";
 
 export function getSortingString(a: EnhancedAlbum): string {
   if(!a.artists) return a.name.replace(/^\d/, "#");
@@ -75,24 +75,26 @@ export interface TrackData {
 }
 
 export interface AudioFeature {
-  danceability: number;
-  energy: number;
-  key: number;
-  loudness: number;
-  mode: number;
-  speechiness: number;
-  acousticness: number;
-  instrumentalness: number;
-  liveness: number;
-  valence: number;
+  // Core fields the DJ maths needs (always present when analysis exists)
+  key?: number;
+  mode?: number;
   tempo: number;
-  type: string;
-  id: string;
-  uri: string;
-  track_href: string;
-  analysis_url: string;
   duration_ms: number;
-  time_signature: number;
+  // Optional descriptive fields sourced from AudioMuse (mood / energy)
+  energy?: number;
+  danceability?: number;
+  valence?: number;
+  loudness?: number;
+  speechiness?: number;
+  acousticness?: number;
+  instrumentalness?: number;
+  liveness?: number;
+  type?: string;
+  id?: string;
+  uri?: string;
+  track_href?: string;
+  analysis_url?: string;
+  time_signature?: number;
 }
 
 export type TrackClickEvent = {
@@ -143,6 +145,7 @@ export const useStore = defineStore("store", {
       albumTags: new Set<string>(),
       set: {} as EnhancedSet,
       searchResults: [] as AlbumData[],
+      allAlbums: [] as EnhancedAlbum[],
     };
   },
   actions: {
@@ -177,27 +180,30 @@ export const useStore = defineStore("store", {
       );
       this.albums = data;
     },
-    async getUserData() {
+    async getUserData(hydrate = true) {
       const { data } = await api.get(`/user`, {
-        params: { c: true },
+        params: hydrate ? { c: true } : {},
       });
       this.userData = data;
-      this.processHydratedCollection();
+      if (hydrate) this.processHydratedCollection();
     },
     processHydratedCollection() {
-      if (!this.userData.collection) return;
-      this.userData.collection.forEach((album: EnhancedAlbum) => {
-        // Store the album data
-        this.albums[album.id] = album;
-        // Update the track-to-album mapping
-        album.tracks.forEach((track) => {
-          this.trackToAlbum[track.id] = album.id;
-        });
-        // Store album tags
-        album.tags.forEach((tag) => {
-          this.albumTags.add(tag);
-        });
-      });
+      const collection = this.userData.collection;
+      if (!collection) return;
+      // Build the indexes in plain locals, then assign once. Mutating reactive
+      // state per track fires a deep watcher that re-walks the whole store each
+      // time, making this O(n^2) and timing out on a few hundred albums.
+      const albums: { [id: string]: EnhancedAlbum } = {};
+      const trackToAlbum: { [track: string]: string } = {};
+      const albumTags = new Set<string>();
+      for (const album of collection) {
+        albums[album.id] = album;
+        for (const track of album.tracks || []) trackToAlbum[track.id] = album.id;
+        for (const tag of album.tags || []) albumTags.add(tag);
+      }
+      this.albums = albums;
+      this.trackToAlbum = trackToAlbum;
+      this.albumTags = albumTags;
     },
     async saveUserData() {
       // Dehydrate the collection by extracting only 'id' and 'tags'
@@ -217,16 +223,10 @@ export const useStore = defineStore("store", {
     //   // No longer necessary since collection is hydrated
     // },
     async search(q: string) {
-      if (q.includes("spotify")) {
-        const id = getSpotifyIDFromURL(q);
-        const { data } = await api.get<AlbumData>(`/album-by-id/${id}`);
-        this.searchResults = [data];
-      } else {
-        const { data } = await api.get<AlbumData[]>("/search", {
-          params: { q },
-        });
-        this.searchResults = data;
-      }
+      const { data } = await api.get<AlbumData[]>("/search", {
+        params: { q },
+      });
+      this.searchResults = data;
     },
     clearSearch() {
       this.searchResults = [];
@@ -245,6 +245,16 @@ export const useStore = defineStore("store", {
       const { data } = await api.put<UserData>(`/user/collection/add/${id}?c=true`);
       this.userData = data;
       this.processHydratedCollection();
+    },
+    async getAllAlbums() {
+      const { data } = await api.get<AlbumData[]>("/all-albums");
+      this.allAlbums = data.map((a) => ({ ...a, tags: [] }));
+    },
+    async importAlbums(ids: string[]) {
+      await api.post(`/user/collection/add`, { ids });
+      // Dehydrated refresh: the import screen only needs the collection ids, not
+      // every album's tracks.
+      await this.getUserData(false);
     },
     async removeFromCollection(id: string) {
       const { data } = await api.put<UserData>(`/user/collection/remove/${id}?c=true`);
@@ -279,7 +289,7 @@ export const useStore = defineStore("store", {
       return (trackId: string) => state.trackToAlbum[trackId];
     },
     allTracks(state) {
-      return Object.values(state.albums.value)
+      return Object.values(state.albums)
         .flatMap((a) => a.tracks)
         .reduce((acc, next) => {
           acc[next.id] = next;

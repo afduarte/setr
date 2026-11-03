@@ -1,18 +1,18 @@
 <template lang="pug">
-.album-wrapper
-  p.cross(@click="$emit('cross-click')") ❌
+.album-wrapper(:class="{ selectable, disabled, unselected: selectable && !selected && !disabled }")
+  p.cross(v-if="!selectable", @click="$emit('cross-click')") ❌
   .album(v-if="isMissingAlbum")
     .info
       img(:src="placeHolder")
       p {{ album }}
-  .album(v-else)
+  .album(v-else, @click="onClick")
     .info
-      img(:src="image")
+      img(:src="image", loading="lazy")
       .details
         .artist
-        p {{ artistNames }}
-          span {{ album.name }} ({{ album.release_date.split("-").shift() }})
-        .tags
+        p {{ hideArtist ? '' : artistNames + ' ' }}
+          span {{ album.name }} ({{ (album.release_date || "").split("-").shift() }})
+        .tags(v-if="!selectable")
           tags-input(:tags="album.tags", @input="$emit('tags-changed')")
     .tracks(v-if="!hideTracks")
       .banner(@click.stop="isExpanded = !isExpanded")
@@ -27,23 +27,29 @@ import SimpleTrackDisplay from "./SimpleTrackDisplay.vue";
 import TagsInput from "./TagsInput.vue";
 import type { EnhancedAlbum } from "@/stores/store";
 import { computed, ref, type PropType } from "vue";
-import AlbumList from "./AlbumList.vue";
-defineEmits(["track-click", "tags-changed"]);
+const emit = defineEmits(["track-click", "tags-changed", "cross-click", "select"]);
 const props = defineProps({
   album: {} as PropType<EnhancedAlbum | string>,
   hideTracks: Boolean,
+  hideArtist: Boolean,
+  selectable: Boolean,
+  selected: Boolean,
+  disabled: Boolean,
 });
 const isExpanded = ref(false);
 const isMissingAlbum = computed(() => typeof props?.album === "string");
 const image = computed(() => {
   const a = props.album as EnhancedAlbum;
-  return a?.images?.find((i) => !!i)?.url || "@/assets/placeholder.png";
+  return a?.images?.find((i) => !!i)?.url || placeHolderURL;
 });
 const artistNames = computed(() => {
   const a = props.album as EnhancedAlbum;
   return a?.artists?.map((a) => a.name).join(", ");
 });
 const placeHolder = computed(() => placeHolderURL);
+function onClick() {
+  if (props.selectable && !props.disabled) emit("select");
+}
 </script>
 <style lang="scss" scoped>
 .album {
@@ -74,6 +80,9 @@ const placeHolder = computed(() => placeHolderURL);
 .cross {
   cursor: pointer;
 }
+.album-wrapper.selectable {
+  cursor: pointer;
+}
 </style>
 <style scoped>
 .album-wrapper {
@@ -82,5 +91,11 @@ const placeHolder = computed(() => placeHolderURL);
   display: grid;
   grid-template-columns: 2fr 45fr;
 }
-
+.album-wrapper.selectable {
+  grid-template-columns: 1fr;
+}
+.album-wrapper.disabled,
+.album-wrapper.unselected {
+  opacity: 0.4;
+}
 </style>

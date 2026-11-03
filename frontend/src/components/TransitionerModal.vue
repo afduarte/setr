@@ -4,23 +4,22 @@ teleport(to="body")
     .mask(@click="close")
     .modal(@click="close")
       .container(@click.stop="")
-        .tracks
+        .tracks(v-if="store.trackA && store.trackB")
           h2 {{ trackName(store.trackA) }}
           wavesurfer(
+            :key="store.trackA.id + '-' + store.trackB.id",
             :trackA="store.trackA",
             :trackB="store.trackB",
-            :srcA="getURL(store.trackAMeta)", 
-            :srcB="getURL(store.trackBMeta)"
+            :srcA="streamURL(store.trackA)",
+            :srcB="streamURL(store.trackB)"
             )
           h2 {{ trackName(store.trackB) }}
-
-          
-
+        p(v-else) Pick an A and B track (the A/B buttons on each track) to compare them.
 </template>
 <script lang="ts" setup>
 import Wavesurfer from "@/components/WaveSurfer.vue";
 import { getFormattedTrackName, type EnhancedTrack } from "@/stores/store";
-import { useTransitionerStore, type TransTrack } from "@/stores/transitioner";
+import { useTransitionerStore } from "@/stores/transitioner";
 
 defineProps<{ show: boolean }>();
 const emit = defineEmits(["close"]);
@@ -30,22 +29,11 @@ function trackName(t: EnhancedTrack) {
   return getFormattedTrackName(t);
 }
 
-function getURL(t: TransTrack) {
-  return `/api/transitioner-dl?id=${t.id}`;
-}
-
-async function fetchTracks() {
-  if (!store.trackA || !store.trackB) return close();
-  const aArtist = store.trackA.artists.map((a) => a.name).join();
-  const bArtist = store.trackB.artists.map((a) => a.name).join();
-  await Promise.all([
-    store.search(aArtist, store.trackA.name, "A"),
-    store.search(bArtist, store.trackB.name, "B"),
-  ]);
+function streamURL(t: EnhancedTrack | null) {
+  return t ? `/api/stream/${t.id}` : "";
 }
 
 function close() {
-  store.clearSearch();
   emit("close");
 }
 </script>

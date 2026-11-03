@@ -1,7 +1,6 @@
 import path from 'path';
 import { readFile, writeFile, access, mkdir } from 'fs/promises'
 import { constants } from 'fs';
-import { compress, decompress } from 'compress-json';
 import Logger from './logger.js';
 import * as url from 'url';
 // Simple cache implementation uses disk for storage.
@@ -47,23 +46,23 @@ export async function getFromCache(id) {
   if(!await isCached(id)) return null;
   try {
     const fileData = await readFile(path.join(STORAGE_LOCATION, id), 'utf-8');
-    const decompressed = decompress(JSON.parse(fileData))
-    return decompressed;
+    return JSON.parse(fileData);
   } catch (err) {
-    console.log(err)
-    throw new Error(`Failed to read file: ${id}`);
+    Logger.error(`Failed to read cache ${id}: ${err.message}`)
+    return null;
   }
 }
 
 export async function storeInCache(id, data) {
   if(await isCached(id)) return null;
   try {
-    const compressed = compress(data);
-    await writeFile(path.join(STORAGE_LOCATION, id), JSON.stringify(compressed));
-    Logger.debug(`"Stored id: ${id}`)
+    // Plain JSON. JSON.stringify drops undefined-valued keys for free.
+    await writeFile(path.join(STORAGE_LOCATION, id), JSON.stringify(data));
+    Logger.debug(`Stored id: ${id}`)
   } catch (err) {
-    console.log(err)
-    throw new Error(`Failed to store data in file: ${id}`);
+    // Caching is best-effort: never let a write failure kill the request that
+    // produced the data.
+    Logger.error(`Failed to cache ${id}: ${err.message}`)
   }
 }
 
