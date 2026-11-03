@@ -150,8 +150,8 @@ export function harmonicDistance(a: TrackData, b: TrackData) {
 
 // Create a shared auth0 client instance
 export const auth0 = createAuth0({
-  domain: "setr.uk.auth0.com",
-  clientId: "qbA6LQKWUmclCFyjqYfJSfH6Wr5RVFST",
+  domain: import.meta.env.VITE_AUTH0_DOMAIN,
+  clientId: import.meta.env.VITE_AUTH0_CLIENT_ID,
   authorizationParams: { redirect_uri: window.location.origin },
 });
 

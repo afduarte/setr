@@ -4,8 +4,9 @@ import * as url from 'url';
 import { readFile, writeFile, mkdir, stat } from 'fs/promises';
 import Logger from './logger.js';
 
-const API = (process.env.AUDIOMUSE_URL || 'https://audiomuse.server.afduarte.co.uk').replace(/\/$/, '');
+const API = (process.env.AUDIOMUSE_URL || '').replace(/\/$/, '');
 const API_KEY = process.env.AUDIOMUSE_API_KEY || '';
+if (!API) Logger.debug('AUDIOMUSE_URL is not set; AudioMuse requests will fail. Set it in backend/.env.');
 if (!API_KEY) Logger.debug('AUDIOMUSE_API_KEY is not set; AudioMuse requests will be rejected.');
 
 // How long a persisted library snapshot stays fresh before we re-sync

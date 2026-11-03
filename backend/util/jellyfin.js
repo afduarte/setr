@@ -3,8 +3,9 @@ import { getFromCache, storeInCache } from './cache.js';
 import Logger from './logger.js';
 import { getAudioFeaturesMap } from './audiomuse.js';
 
-const API = (process.env.JELLYFIN_URL || 'https://server.afduarte.co.uk/jellyfin').replace(/\/$/, '');
+const API = (process.env.JELLYFIN_URL || '').replace(/\/$/, '');
 const API_KEY = process.env.JELLYFIN_API_KEY || '';
+if (!API) Logger.debug('JELLYFIN_URL is not set; Jellyfin requests will fail. Set it in backend/.env.');
 if (!API_KEY) Logger.debug('JELLYFIN_API_KEY is not set; Jellyfin requests will be rejected.');
 
 const AUTH_HEADERS = {
