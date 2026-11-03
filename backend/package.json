@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "HTTPS=false node ./bin/www.js"
+    "dev": "HTTPS=false node ./bin/www.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "axios": "^1.2.3",
@@ -18,5 +20,9 @@
     "qs": "^6.11.0",
     "uuid": "^9.0.1",
     "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.1",
+    "vitest": "^5.0.5"
   }
 }

@@ -37,7 +37,9 @@ export const useLiveStore = defineStore("liveStore", {
   },
 });
 
-function rank(a: TrackData, b: TrackData, playedSongs: EnhancedTrack[]) {
+// Exported as a pure function so the ranking maths can be unit-tested and
+// reused (e.g. by the transitioner) without a store instance.
+export function rank(a: TrackData, b: TrackData, playedSongs: EnhancedTrack[]) {
   const aFeatures = a?.audioFeatures;
   const bFeatures = b?.audioFeatures;
   if (!aFeatures || !bFeatures) return Number.MAX_SAFE_INTEGER;
