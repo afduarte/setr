@@ -36,9 +36,11 @@ curl localhost:3000/api/health        # dependency check
 
 ## Config
 
-`backend/.env` (gitignored; see `.env.example`): `JELLYFIN_URL`,
-`JELLYFIN_API_KEY`, `AUDIOMUSE_URL`, `AUDIOMUSE_API_KEY`. Optional:
-`JELLYFIN_USER_ID` (defaults to an admin), `AUDIOMUSE_CACHE_TTL_MS`.
+`backend/.env` (gitignored; see `backend/.env.example`): `JELLYFIN_URL`,
+`JELLYFIN_API_KEY`, `AUDIOMUSE_URL`, `AUDIOMUSE_API_KEY`, `AUTH0_DOMAIN`.
+Optional: `JELLYFIN_USER_ID` (defaults to an admin), `AUDIOMUSE_CACHE_TTL_MS`.
+`frontend/.env` (gitignored; see `frontend/.env.example`): `VITE_AUTH0_DOMAIN`,
+`VITE_AUTH0_CLIENT_ID`.
 
 ## API (`/api`)
 

@@ -4,7 +4,9 @@ import axios from 'axios';
 import { readFile, writeFile, access, mkdir } from 'fs/promises'
 import { constants } from 'fs';
 import Logger from './logger.js';
-const AUTH_ENDPOINT = "https://setr.uk.auth0.com"
+const AUTH_DOMAIN = process.env.AUTH0_DOMAIN || '';
+if (!AUTH_DOMAIN) Logger.debug('AUTH0_DOMAIN is not set; Auth0 user-info lookups will fail. Set it in backend/.env.');
+const AUTH_ENDPOINT = AUTH_DOMAIN ? `https://${AUTH_DOMAIN}` : '';
 // Auth0 user fetch function
 export async function getUserInfo(token) {
   const { data } = await axios.get(`${AUTH_ENDPOINT}/userinfo`, { 

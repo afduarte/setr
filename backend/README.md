@@ -24,6 +24,15 @@ JELLYFIN_URL=https://your-jellyfin/jellyfin
 JELLYFIN_API_KEY=...
 AUDIOMUSE_URL=https://your-audiomuse
 AUDIOMUSE_API_KEY=...
+AUTH0_DOMAIN=your-tenant.eu.auth0.com
+```
+
+The frontend reads its Auth0 config from `frontend/.env` (see
+`frontend/.env.example`):
+
+```
+VITE_AUTH0_DOMAIN=your-tenant.eu.auth0.com
+VITE_AUTH0_CLIENT_ID=...
 ```
 
 `JELLYFIN_USER_ID` is optional (an admin user is picked automatically).
