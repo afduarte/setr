@@ -36,17 +36,6 @@ services:
     #   - "5432:5432"
     networks:
       - setr-net
-  # spotify-cache:
-  #   image: varnish:7.3-alpine
-  #   restart: on-failure
-  #   ports:
-  #     - "4080:80"
-  #   environment:
-  #     VARNISH_SIZE: 500M
-  #   volumes:
-  #     - ${PWD}/spotify-cache/default.vcl:/etc/varnish/default.vcl
-  #   networks:
-  #     - setr-net
 
 networks:
   setr-net:

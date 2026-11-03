@@ -3,6 +3,7 @@ nav
   router-link(to="/app/csv") Upload CSV
   router-link(to="/app/sets") Sets
   router-link(to="/app/collection") Collection
+  router-link(to="/app/import") Import
   router-link(to="/app/live") Live View
   router-link(to="/logout") Logout
 main

@@ -14,8 +14,6 @@
         .tags
           tags-input(@click.stop="", :tags="album.tags", @input="$emit('tags-changed')")
   .suggestions
-    .search
-      input(type="text", placeholder="Song search...", @input="liveStore.songSearch($event.target.value)")
 
 </template>
 <script setup lang="ts">

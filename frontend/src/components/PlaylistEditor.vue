@@ -11,7 +11,7 @@
         :locked="lock",
         @mouseover-tempo="tempoFocused = true",
         @mouseleave-tempo="tempoFocused = false",
-        @cross-click="$emit('track-click', {track:t, index:index})",
+        @cross-click="$emit('track-click', {track:element, index:index})",
         @transitioner-a="transStore.setTrackA",
         @transitioner-b="transStore.setTrackB",
       )

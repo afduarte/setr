@@ -31,9 +31,8 @@ import {
   watch,
   type Ref,
 } from "vue";
-import WaveSurfer, { type WavesurferParams } from "wavesurfer.js";
-// import Minimap from "wavesurfer.js/dist/plugin/wavesurfer.minimap.js";
-// import * as Minimap from "wavesurfer.js/dist/plugin/wavesurfer.minimap.js";
+import WaveSurfer from "wavesurfer.js";
+import Minimap from "wavesurfer.js/dist/plugins/minimap.js";
 import VueSlider from "vue-slider-component";
 import "vue-slider-component/theme/antd.css";
 import { useScrollDrag } from "@/composables/useScrollDrag";
@@ -65,7 +64,8 @@ watch(volA, (newVal: number) => wsA?.value?.setVolume(newVal));
 watch(volB, (newVal: number) => wsB?.value?.setVolume(newVal));
 // load
 onMounted(() => {
-  const baseOptions = {
+  if (!elA.value || !elB.value) return;
+  const baseOptions: any = {
     backend: "WebAudio",
     waveColor: "#00eeffbb",
     progressColor: "purple",
@@ -85,18 +85,14 @@ onMounted(() => {
   // create the 2 instances
   wsA.value = WaveSurfer.create({
     ...baseOptions,
-    container: elA?.value,
+    container: elA.value,
     audioRate: rateA.value,
     plugins: [
       Minimap.create({
-        container: mapA?.value,
+        container: mapA.value as HTMLElement,
         waveColor: "gray",
         progressColor: "white",
         height: 50,
-        showRegions: true,
-        regionsMinWidth: 0.5,
-        regionsMaxWidth: 5.0,
-        regions: [],
       }),
     ],
   });
@@ -106,18 +102,14 @@ onMounted(() => {
   }
   wsB.value = WaveSurfer.create({
     ...baseOptions,
-    container: elB?.value,
+    container: elB.value,
     audioRate: rateB.value,
     plugins: [
       Minimap.create({
-        container: mapB?.value,
+        container: mapB.value as HTMLElement,
         waveColor: "gray",
         progressColor: "white",
         height: 30,
-        showRegions: true,
-        regionsMinWidth: 0.5,
-        regionsMaxWidth: 5.0,
-        regions: [],
       }),
     ],
   });
@@ -133,19 +125,21 @@ onMounted(() => {
   wsB.value.on("ready", () => centerplayhead(wsB.value));
 });
 
-function centerplayhead(ws: WaveSurfer | null) {
-  console.log("centering playhead")
+function centerplayhead(ws: any) {
   if (!ws) return;
-  const sampleRate = 1000;
-  const numberOfSamples = sampleRate * ws.getDuration();
-  const peaks = ws.backend.getPeaks(numberOfSamples);
-  // Calculate the position of the audio start
-  const silence = Array(sampleRate * 5 * 2).fill(0);
-  console.log(silence);
-  ws.backend.setPeaks(silence.concat(peaks));
-  // const startPosition = ws.container.clientWidth / 2;
-  // // Set the waveform to start at the calculated position
-  // ws.drawer.container.style.marginLeft = `${startPosition}px`;
+  try {
+    // Guarded: the WebAudio backend may not expose getPeaks/setPeaks in every
+    // wavesurfer.js version. The waveform still renders without the offset.
+    const backend: any = (ws as any).backend;
+    if (!backend?.getPeaks || !backend?.setPeaks) return;
+    const sampleRate = 1000;
+    const numberOfSamples = sampleRate * ws.getDuration();
+    const peaks = backend.getPeaks(numberOfSamples);
+    const silence = Array(sampleRate * 5 * 2).fill(0);
+    backend.setPeaks(silence.concat(peaks));
+  } catch (e) {
+    console.warn("centerplayhead skipped", e);
+  }
 }
 onBeforeUnmount(() => {
   wsA?.value?.destroy();
