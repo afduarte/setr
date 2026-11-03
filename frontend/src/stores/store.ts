@@ -232,7 +232,7 @@ export const useStore = defineStore("store", {
       this.searchResults = [];
     },
     async addSet() {
-      const { data } = await api.post<UserData>(`/user/set/new?c=treu`);
+      const { data } = await api.post<UserData>(`/user/set/new`);
       this.userData = data;
       this.processHydratedCollection();
     },

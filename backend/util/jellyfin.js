@@ -87,7 +87,7 @@ function artistRefs(item) {
   return name ? [{ id: '', name, type: 'artist' }] : [];
 }
 
-function normalizeReleaseDate(item) {
+export function normalizeReleaseDate(item) {
   if (item?.ProductionYear) return String(item.ProductionYear);
   if (item?.PremiereDate) return String(item.PremiereDate).split('T')[0];
   return '';
@@ -100,12 +100,12 @@ function normalizeImages(item) {
   return [{ url: `/api/image/${item.Id}`, height: 300, width: 300 }];
 }
 
-function normalizeDuration(ticks) {
+export function normalizeDuration(ticks) {
   if (!ticks) return 0;
   return Math.round(ticks / 10000); // ticks are 100ns units -> ms
 }
 
-function normalizeAlbumSummary(item) {
+export function normalizeAlbumSummary(item) {
   return {
     id: item.Id,
     name: item.Name,
@@ -119,7 +119,7 @@ function normalizeAlbumSummary(item) {
   };
 }
 
-function normalizeTrack(item) {
+export function normalizeTrack(item) {
   return {
     id: item.Id,
     name: item.Name,
